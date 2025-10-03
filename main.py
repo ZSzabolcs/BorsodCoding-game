@@ -176,7 +176,7 @@ class World():
 			img_rect = img.get_rect()
 			img_rect.x = col_count * tile_size
 			img_rect.y = row_count * tile_size
-			block = DissapearingBlock(img_rect.x, img_rect.y, img, seconds)
+			block = DisappearingBlock(img_rect.x, img_rect.y, img, seconds)
 			self.dissaperaingBlocks.append(block)
 
 
@@ -384,7 +384,7 @@ class Stalactite(pygame.sprite.Sprite):
 
 
 
-class DissapearingBlock(pygame.sprite.Sprite):
+class DisappearingBlock(pygame.sprite.Sprite):
 	def __init__(self, x, y, image, second):
 		pygame.sprite.Sprite.__init__(self)
 		self.image = image
