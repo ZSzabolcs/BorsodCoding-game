@@ -423,7 +423,9 @@ def saving_game(points, level, chosen_lang):
 
 
 
-loginWindow()
+login = loginWindow()
+if login.successfull:
+	print("Sikeres bejelnetkezés")
 
 pygame.init()
 
