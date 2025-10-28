@@ -6,6 +6,7 @@ import asyncio
 import time
 import json
 import requests
+from login import loginWindow
 from menu import menu_page
 from styles import BLACK
 from styles import RED
@@ -421,6 +422,8 @@ def saving_game(points, level, chosen_lang):
 		file.close()
 
 
+
+loginWindow()
 
 pygame.init()
 
