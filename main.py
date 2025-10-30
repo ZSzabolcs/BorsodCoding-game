@@ -6,6 +6,7 @@ import asyncio
 import time
 import json
 import requests
+import datetime
 from login import loginWindow
 from menu import menu_page
 from styles import BLACK
@@ -35,7 +36,7 @@ class Enemy(pygame.sprite.Sprite):
 		ground_beneath_next = 0
 		self.rect.x += self.move_direction * self.speed
 
-		for tile in worlds_list[self.level].tile_list:
+		for tile in World.worlds_list[self.level].tile_list:
 				if tile["imageRect"].collidepoint(self.rect.right, self.rect.midright[1]) and tile["number"] > 0:
 					self.move_direction *= -1
 				if tile["imageRect"].collidepoint(self.rect.left, self.rect.midleft[1]) and tile["number"] > 0:
@@ -83,7 +84,7 @@ class Player():
 			self.vel_y = 10
 		dy += self.vel_y
 
-		for tile in worlds_list[self.level].tile_list:
+		for tile in World.worlds_list[self.level].tile_list:
 			if tile["imageRect"].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
 				if key[pygame.K_UP] == 0:
 					self.jumped = 0
@@ -104,7 +105,7 @@ class Player():
 			if tile["imageRect"].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
 				dx = 0
 
-		for enemy in worlds_list[self.level].world_enemy_group:
+		for enemy in World.worlds_list[self.level].world_enemy_group:
 			if self.rect.colliderect(enemy.rect):
 				if self.rect.bottom <= enemy.rect.top + 10:
 					enemy.kill()  
@@ -112,7 +113,7 @@ class Player():
 				else: 
 					self.died = 1
 
-		for block in worlds_list[self.level].dissaperaingBlocks:
+		for block in World.worlds_list[self.level].dissaperaingBlocks:
 			if block.rect.colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
 				if key[pygame.K_UP] == 0:
 					self.jumped = 0
@@ -124,7 +125,7 @@ class Player():
 					self.vel_y = 0
 
 
-		for fireball in worlds_list[self.level].fireballs_group:
+		for fireball in World.worlds_list[self.level].fireballs_group:
 			if self.rect.colliderect(fireball.rect):
 				self.died = 1
 
@@ -147,6 +148,9 @@ class Player():
 
 
 class World():
+	tile_size = 50
+	in_game_menu_rects = []
+	worlds_list = []
 	def __init__(self, data : list, level : int, level_name : str):
 		self.world_map = data
 		self.level = level - 1
@@ -157,6 +161,7 @@ class World():
 		self.stalactite_group = pygame.sprite.Group()
 		self.player_place = None
 		self.dissaperaingBlocks = []
+
 		
 
 		dirt_img = pygame.image.load(os.path.join("kepek", "dirt.png"))
@@ -173,10 +178,10 @@ class World():
 
 
 		def make_just_disappearing_block(image, col_count, row_count, seconds):
-			img = pygame.transform.scale(image, (tile_size, tile_size))
+			img = pygame.transform.scale(image, (World.tile_size, World.tile_size))
 			img_rect = img.get_rect()
-			img_rect.x = col_count * tile_size
-			img_rect.y = row_count * tile_size
+			img_rect.x = col_count * World.tile_size
+			img_rect.y = row_count * World.tile_size
 			block = DisappearingBlock(img_rect.x, img_rect.y, img, seconds)
 			self.dissaperaingBlocks.append(block)
 
@@ -194,11 +199,11 @@ class World():
 			self.tile_list.append(tile)
 
 
-		def make_tile(image, tile_size, col_count, row_count, typeofnumber):
-			img = pygame.transform.scale(image, (tile_size, tile_size))
+		def make_tile(image, col_count, row_count, typeofnumber):
+			img = pygame.transform.scale(image, (World.tile_size, World.tile_size))
 			img_rect = img.get_rect()
-			img_rect.x = col_count * tile_size
-			img_rect.y = row_count * tile_size
+			img_rect.x = col_count * World.tile_size
+			img_rect.y = row_count * World.tile_size
 			tile = {
 				"image" : img,
 				"imageRect" : img_rect, 
@@ -213,41 +218,41 @@ class World():
 			col_count = 0
 			for tile in row:
 				if tile == 1:
-					make_just_tile(dirt_img, tile_size, col_count, row_count, 1)
+					make_just_tile(dirt_img, World.tile_size, col_count, row_count, 1)
 					
 				if tile == 2:
-					make_just_tile(grass_img, tile_size, col_count, row_count, 2)
+					make_just_tile(grass_img, World.tile_size, col_count, row_count, 2)
 					
 				if tile == 3:
-					make_just_tile(goal_img, tile_size, col_count, row_count, 3)
+					make_just_tile(goal_img, World.tile_size, col_count, row_count, 3)
 
 				if tile == DEADLY:
-					make_just_tile(water_img, tile_size, col_count, row_count, DEADLY)
+					make_just_tile(water_img, World.tile_size, col_count, row_count, DEADLY)
 
 				if tile == 5:
-					make_just_tile(goal2_img, tile_size, col_count, row_count, 5)
+					make_just_tile(goal2_img, World.tile_size, col_count, row_count, 5)
 
 				if tile == 6:
-					enemy = Enemy(col_count * tile_size, row_count * tile_size + 15, self.level)
+					enemy = Enemy(col_count * World.tile_size, row_count * World.tile_size + 15, self.level)
 					self.world_enemy_group.add(enemy)
 				
 				if tile == 7:
-					make_just_tile(rock_img, tile_size, col_count, row_count, 7)
+					make_just_tile(rock_img, World.tile_size, col_count, row_count, 7)
 				
 				if tile == 8:
-					make_just_tile(lava_img, tile_size, col_count, row_count, DEADLY)
+					make_just_tile(lava_img, World.tile_size, col_count, row_count, DEADLY)
 
 				if tile == 9:
-					make_just_tile(snow2_img, tile_size, col_count, row_count, 9)
+					make_just_tile(snow2_img, World.tile_size, col_count, row_count, 9)
 				
 				if tile == 10:
-					make_just_tile(snow_img, tile_size, col_count, row_count, 10)
+					make_just_tile(snow_img, World.tile_size, col_count, row_count, 10)
 
 				if tile == 11:
-					make_just_tile(water2_img, tile_size, col_count, row_count, DEADLY)
+					make_just_tile(water2_img, World.tile_size, col_count, row_count, DEADLY)
 
 				if tile == 12:
-					make_just_tile(ice_img, tile_size, col_count, row_count, 12)
+					make_just_tile(ice_img, World.tile_size, col_count, row_count, 12)
 
 				if tile == "b1":
 					make_just_disappearing_block(rock_img, col_count, row_count, 2)
@@ -262,17 +267,17 @@ class World():
 					make_just_disappearing_block(snow_img, col_count, row_count, 2)
 
 				if tile == "p":
-					self.player_place = Player(level, 0, col_count * tile_size, row_count * tile_size)
+					self.player_place = Player(level, 0, col_count * World.tile_size, row_count * World.tile_size)
 
 				if tile == "fb":
-					fireball = Fireball(col_count * tile_size, row_count * tile_size)
-					tile = make_tile(lava_img, tile_size, col_count, row_count, DEADLY)
+					fireball = Fireball(col_count * World.tile_size, row_count * World.tile_size)
+					tile = make_tile(lava_img, col_count, row_count, DEADLY)
 					self.fireballs_group.add(fireball)
 					self.tile_list.append(tile)
 				
 				if tile == "st":
-					tile = make_tile(rock_img, tile_size, col_count, row_count, 7)
-					stalactite = Stalactite(col_count * tile_size, row_count * tile_size, tile)
+					tile = make_tile(rock_img, col_count, row_count, 7)
+					stalactite = Stalactite(col_count * World.tile_size, row_count * World.tile_size, tile)
 					self.stalactite_group.add(stalactite)
 					self.tile_list.append(tile)
 
@@ -298,11 +303,11 @@ class World():
 			if pause and not run:
 
 				if ch_lang == "en":
-					quit_game_text_place = ((in_game_menu_rects[0].center[0])-(in_game_menu_rects[0].center[0]*0.30), in_game_menu_rects[0].center[1]-15)
+					quit_game_text_place = ((World.in_game_menu_rects[0].center[0])-(World.in_game_menu_rects[0].center[0]*0.30), World.in_game_menu_rects[0].center[1]-15)
 				else:
-					quit_game_text_place = ((in_game_menu_rects[0].center[0])-(in_game_menu_rects[0].center[0]*0.45), in_game_menu_rects[0].center[1]-15)
+					quit_game_text_place = ((World.in_game_menu_rects[0].center[0])-(World.in_game_menu_rects[0].center[0]*0.45), World.in_game_menu_rects[0].center[1]-15)
 
-				for rect in in_game_menu_rects:
+				for rect in World.in_game_menu_rects:
 					square = pygame.draw.rect(screen, BLACK, rect)
 					if square.collidepoint(float(mouse[0]), float(mouse[1])) and mouse is not None:
 						square = pygame.draw.rect(screen, BLUE, rect)
@@ -411,12 +416,24 @@ class DisappearingBlock(pygame.sprite.Sprite):
 
 
 
-def saving_game(points, level, chosen_lang):
+def saving_game(points, level, chosen_lang, name):
 	saving = {
+		"name": name,
 		"points" : points,
 		"level" : level,
-		"choosenLanguage" : choosen_language
+		"language" : choosen_language,
+		"date" : datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 	}
+	url = "http://localhost:5233/api/UserSaveData"
+
+	response = requests.post(url=url, json=saving)
+	
+	print(response.json())
+
+	response.raise_for_status()
+
+	print(response.text)
+
 	with open("saves.csv", "w") as file:
 		file.write(f"{str(points)} {str(level)} {chosen_lang}")
 		file.close()
@@ -424,6 +441,7 @@ def saving_game(points, level, chosen_lang):
 
 
 login = loginWindow()
+NAME = login.name
 if login.successfull:
 	print("Sikeres bejelnetkezés")
 
@@ -452,7 +470,6 @@ if music_is_on:
 		
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption(languages[choosen_language][0])
-tile_size = 50
 bg_img = pygame.image.load(os.path.join("kepek", "hatter.png")).convert()
 bg_img = pygame.transform.scale(bg_img, (1000, 1000))
 bg2_img = pygame.image.load(os.path.join("kepek", "hatter2.png")).convert()
@@ -474,9 +491,10 @@ world7 = World(worlds.world7_data, 7, f"{level_name}: 7")
 world8 = World(worlds.world8_data, 8, f"{level_name}: 8")
 world9 = World(worlds.world9_data, 9, f"{level_name}: 9")
 world10 = World(worlds.world10_data, 10, f"{level_name}: 10")
-worlds_list = [world, world2, world3, world4, world5, world6, world7, world8, world9, world10]
+World.worlds_list = [world, world2, world3, world4, world5, world6, world7, world8, world9, world10]
+#worlds_list = [world, world2, world3, world4, world5, world6, world7, world8, world9, world10]
 
-in_game_menu_rects = [
+World.in_game_menu_rects = [
 	pygame.rect.Rect(screen_width*0.27, screen_height/2-50, screen_width*0.5, screen_width*0.1)
 ]
 
@@ -487,7 +505,7 @@ async def main(level):
 	FPS = 60
 	pause = 0
 	while run and not pause:
-		current_world = worlds_list[level - 1]
+		current_world = World.worlds_list[level - 1]
 		clock.tick(FPS)
 		if level < 4:
 			screen.blit(bg_img, (0, 0))
@@ -538,11 +556,11 @@ async def main(level):
 					pause = 0
 					run = 0
 				elif event.type == pygame.MOUSEBUTTONDOWN:
-					for rect in in_game_menu_rects:
+					for rect in World.in_game_menu_rects:
 						if rect.collidepoint(float(mouse[0]), float(mouse[1])):
-							if in_game_menu_rects.index(rect) == 0:
+							if World.in_game_menu_rects.index(rect) == 0:
 								pause, run = 0, 0
-								saving_game(points, level, choosen_language)
+								saving_game(points, level, choosen_language, NAME)
 
 
 
@@ -550,7 +568,7 @@ async def main(level):
 		await asyncio.sleep(0)
 
 	if not run and not pause:
-		saving_game(points, level, choosen_language)
+		saving_game(points, level, choosen_language, NAME)
 		pygame.quit()
 
 asyncio.run(main(level))
