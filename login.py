@@ -19,6 +19,7 @@ def login(name_entry, passw_entry, URL, app, root):
         print("Sikeres kérés")
         print(response.status_code)
         app.successfull = True
+        app.name = name_entry.get()
         data = response.json()
         print("JSON válasz")
         print(data)
@@ -35,6 +36,7 @@ def loginWindow():
     class App:
         def __init__(self):
            self.successfull = False
+           self.name = ""
 
     LOGIN_URL = "http://localhost:5233/api/UserRegistData/Login"
 
