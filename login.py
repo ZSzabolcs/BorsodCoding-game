@@ -2,6 +2,7 @@ import tkinter
 from tkinter import ttk
 import requests
 import datetime
+import sys
 
 def login(name_entry, passw_entry, URL, app, root):
     timestamp = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
@@ -44,7 +45,7 @@ def loginWindow():
     openedApp = App()
     app.geometry("300x200")
     app.title("For The Potatoe login")
-    app.protocol("WM_DELETE_WINDOW", app.destroy)
+    app.protocol("WM_DELETE_WINDOW", sys.exit)
 
     username_label = ttk.Label(app, text="Username:")
     username_label.pack(pady=2)
