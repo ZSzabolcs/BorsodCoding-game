@@ -3,417 +3,16 @@ from pygame.locals import *
 import os
 import worlds
 import asyncio
-import time
 import json
 import requests
 import datetime
 from login import loginWindow
 from menu import menu_page
-from styles import BLACK
-from styles import RED
-from styles import BLUE
-from styles import WHITE
+from styles import Color
 from styles import set_language
 from styles import languages
 from styles import Selected_fonts
-
-
-class Enemy(pygame.sprite.Sprite):
-	def __init__(self, x, y, level):
-		pygame.sprite.Sprite.__init__(self)
-		img = pygame.image.load(os.path.join("kepek", "enemy.png")).convert()
-		self.image = pygame.transform.scale(img, (40, 40))
-		self.rect = self.image.get_rect()
-		self.rect.x = x
-		self.rect.y = y
-		self.move_direction = 1
-		self.speed = 1
-		self.level = level
-
-	def update(self):
-		next_x = self.rect.x + self.move_direction * self.speed
-		next_bottom = self.rect.bottom + 1
-		ground_beneath_next = 0
-		self.rect.x += self.move_direction * self.speed
-
-		for tile in World.worlds_list[self.level].tile_list:
-				if tile["imageRect"].collidepoint(self.rect.right, self.rect.midright[1]) and tile["number"] > 0:
-					self.move_direction *= -1
-				if tile["imageRect"].collidepoint(self.rect.left, self.rect.midleft[1]) and tile["number"] > 0:
-					self.move_direction *= -1
-				if tile["imageRect"].colliderect(next_x + self.rect.width // 2, next_bottom, 1, 1):
-					ground_beneath_next = 1
-
-		if not ground_beneath_next:
-			self.move_direction *= -1
-
-
-
-class Player():
-	def __init__(self, level, completed, x, y):
-		img = pygame.image.load(os.path.join("kepek", "trollface.jpg"))
-		self.image = pygame.transform.scale(img, (40, 40))
-		self.rect = self.image.get_rect()
-		self.level = level - 1
-		self.rect.x = x
-		self.rect.y = y
-		self.vel_y = 0
-		self.jumped = 0
-		self.width = self.image.get_width()
-		self.height = self.image.get_height()
-		self.checkpoint_x = self.rect.x
-		self.checkpoint_y = self.rect.y
-		self.died = 0
-		self.completed = completed
-		self.player_place = None
-
-	def update(self):
-		dx = 0
-		dy = 0
-		key = pygame.key.get_pressed()
-		if key[pygame.K_LEFT]:
-			dx -= 5
-		if key[pygame.K_RIGHT]:
-			dx += 5
-		if key[pygame.K_UP] and self.jumped == 0:
-			self.vel_y = -15
-			self.jumped = 1
-
-		self.vel_y += 1
-		if self.vel_y > 10:
-			self.vel_y = 10
-		dy += self.vel_y
-
-		for tile in World.worlds_list[self.level].tile_list:
-			if tile["imageRect"].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
-				if key[pygame.K_UP] == 0:
-					self.jumped = 0
-				if self.vel_y < 0:
-					dy = tile["imageRect"].bottom - self.rect.top
-					self.vel_y = 0
-				elif self.vel_y >= 0:
-					dy = tile["imageRect"].top - self.rect.bottom
-					self.vel_y = 0
-				if tile["number"] == 4:
-					self.died = 1
-				if tile["number"] == 3:
-					self.checkpoint_x = tile["imageRect"].x
-					self.checkpoint_y = tile["imageRect"].y
-				if tile["number"] == 5:
-					return 1
-		
-			if tile["imageRect"].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
-				dx = 0
-
-		for enemy in World.worlds_list[self.level].world_enemy_group:
-			if self.rect.colliderect(enemy.rect):
-				if self.rect.bottom <= enemy.rect.top + 10:
-					enemy.kill()  
-					self.vel_y = -10 
-				else: 
-					self.died = 1
-
-		for block in World.worlds_list[self.level].dissaperaingBlocks:
-			if block.rect.colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
-				if key[pygame.K_UP] == 0:
-					self.jumped = 0
-				if self.vel_y < 0 and block.visible:
-					dy = block.rect.bottom - self.rect.top
-					self.vel_y = 0					
-				elif self.vel_y >= 0 and block.visible:
-					dy = block.rect.top - self.rect.bottom
-					self.vel_y = 0
-
-
-		for fireball in World.worlds_list[self.level].fireballs_group:
-			if self.rect.colliderect(fireball.rect):
-				self.died = 1
-
-		if self.rect.bottom > screen_height:
-			self.rect.bottom = screen_height
-			dy = 0
-			
-		if self.died == 0:
-			self.rect.x += dx
-			self.rect.y += dy
-		
-		else:
-			self.rect.x = self.checkpoint_x
-			self.rect.y = self.checkpoint_y
-			self.died = 0
-
-		screen.blit(self.image, self.rect)
-
-
-
-
-class World():
-	tile_size = 50
-	in_game_menu_rects = []
-	worlds_list = []
-	def __init__(self, data : list, level : int, level_name : str):
-		self.world_map = data
-		self.level = level - 1
-		self.level_name = level_name
-		self.tile_list = []
-		self.world_enemy_group = pygame.sprite.Group()
-		self.fireballs_group = pygame.sprite.Group()
-		self.stalactite_group = pygame.sprite.Group()
-		self.player_place = None
-		self.dissaperaingBlocks = []
-
-		
-
-		dirt_img = pygame.image.load(os.path.join("kepek", "dirt.png"))
-		grass_img = pygame.image.load(os.path.join("kepek","grass.png"))
-		goal_img = pygame.image.load(os.path.join("kepek", "goal.png"))
-		water_img = pygame.image.load(os.path.join("kepek", "water.png"))
-		water2_img = pygame.image.load(os.path.join("kepek", "water2.png"))
-		goal2_img = pygame.image.load(os.path.join("kepek", "goal2.png"))
-		rock_img = pygame.image.load(os.path.join("kepek", "rock.png"))
-		lava_img = pygame.image.load(os.path.join("kepek", "lava.png"))
-		snow_img = pygame.image.load(os.path.join("kepek", "snow.png"))
-		snow2_img = pygame.image.load(os.path.join("kepek", "snow2.png"))
-		ice_img = pygame.image.load(os.path.join("kepek", "ice.png"))
-
-
-		def make_just_disappearing_block(image, col_count, row_count, seconds):
-			img = pygame.transform.scale(image, (World.tile_size, World.tile_size))
-			img_rect = img.get_rect()
-			img_rect.x = col_count * World.tile_size
-			img_rect.y = row_count * World.tile_size
-			block = DisappearingBlock(img_rect.x, img_rect.y, img, seconds)
-			self.dissaperaingBlocks.append(block)
-
-
-		def make_just_tile(image, tile_size, col_count, row_count, typeofnumber):
-			img = pygame.transform.scale(image, (tile_size, tile_size))
-			img_rect = img.get_rect()
-			img_rect.x = col_count * tile_size
-			img_rect.y = row_count * tile_size
-			tile = {
-				"image" : img,
-				"imageRect" : img_rect, 
-				"number" : typeofnumber
-			}
-			self.tile_list.append(tile)
-
-
-		def make_tile(image, col_count, row_count, typeofnumber):
-			img = pygame.transform.scale(image, (World.tile_size, World.tile_size))
-			img_rect = img.get_rect()
-			img_rect.x = col_count * World.tile_size
-			img_rect.y = row_count * World.tile_size
-			tile = {
-				"image" : img,
-				"imageRect" : img_rect, 
-				"number" : typeofnumber
-			}
-			return tile
-		
-
-		DEADLY = 4
-		row_count = 0
-		for row in self.world_map:
-			col_count = 0
-			for tile in row:
-				if tile == 1:
-					make_just_tile(dirt_img, World.tile_size, col_count, row_count, 1)
-					
-				if tile == 2:
-					make_just_tile(grass_img, World.tile_size, col_count, row_count, 2)
-					
-				if tile == 3:
-					make_just_tile(goal_img, World.tile_size, col_count, row_count, 3)
-
-				if tile == DEADLY:
-					make_just_tile(water_img, World.tile_size, col_count, row_count, DEADLY)
-
-				if tile == 5:
-					make_just_tile(goal2_img, World.tile_size, col_count, row_count, 5)
-
-				if tile == 6:
-					enemy = Enemy(col_count * World.tile_size, row_count * World.tile_size + 15, self.level)
-					self.world_enemy_group.add(enemy)
-				
-				if tile == 7:
-					make_just_tile(rock_img, World.tile_size, col_count, row_count, 7)
-				
-				if tile == 8:
-					make_just_tile(lava_img, World.tile_size, col_count, row_count, DEADLY)
-
-				if tile == 9:
-					make_just_tile(snow2_img, World.tile_size, col_count, row_count, 9)
-				
-				if tile == 10:
-					make_just_tile(snow_img, World.tile_size, col_count, row_count, 10)
-
-				if tile == 11:
-					make_just_tile(water2_img, World.tile_size, col_count, row_count, DEADLY)
-
-				if tile == 12:
-					make_just_tile(ice_img, World.tile_size, col_count, row_count, 12)
-
-				if tile == "b1":
-					make_just_disappearing_block(rock_img, col_count, row_count, 2)
-
-				if tile == "b2":
-					make_just_disappearing_block(grass_img, col_count, row_count, 3)
-
-				if tile == "b3":
-					make_just_disappearing_block(snow_img, col_count, row_count, 2)
-
-				if tile == "b4":
-					make_just_disappearing_block(snow_img, col_count, row_count, 2)
-
-				if tile == "p":
-					self.player_place = Player(level, 0, col_count * World.tile_size, row_count * World.tile_size)
-
-				if tile == "fb":
-					fireball = Fireball(col_count * World.tile_size, row_count * World.tile_size)
-					tile = make_tile(lava_img, col_count, row_count, DEADLY)
-					self.fireballs_group.add(fireball)
-					self.tile_list.append(tile)
-				
-				if tile == "st":
-					tile = make_tile(rock_img, col_count, row_count, 7)
-					stalactite = Stalactite(col_count * World.tile_size, row_count * World.tile_size, tile)
-					self.stalactite_group.add(stalactite)
-					self.tile_list.append(tile)
-
-				col_count += 1
-			row_count += 1
-
-
-
-	def draw(self, pause, run, lang, ch_lang, mouse = None):
-
-		def draw_left_top_texts():
-			if self.level < 5:
-				chosen_color = BLACK
-			else:
-				chosen_color = WHITE
-
-			level_text = fonts.font_size50.render(self.level_name, 0, chosen_color)
-			level_text_place = level_text.get_rect()
-			screen.blit(level_text, level_text_place)
-
-
-		for tile in self.tile_list:
-			if pause and not run:
-
-				if ch_lang == "en":
-					quit_game_text_place = ((World.in_game_menu_rects[0].center[0])-(World.in_game_menu_rects[0].center[0]*0.30), World.in_game_menu_rects[0].center[1]-15)
-				else:
-					quit_game_text_place = ((World.in_game_menu_rects[0].center[0])-(World.in_game_menu_rects[0].center[0]*0.45), World.in_game_menu_rects[0].center[1]-15)
-
-				for rect in World.in_game_menu_rects:
-					square = pygame.draw.rect(screen, BLACK, rect)
-					if square.collidepoint(float(mouse[0]), float(mouse[1])) and mouse is not None:
-						square = pygame.draw.rect(screen, BLUE, rect)
-				quit_game_text = fonts.font_size50.render(lang[ch_lang][5], 0, RED)
-				screen.blit(quit_game_text, quit_game_text_place)
-				draw_left_top_texts()
-				pygame.display.update()
-
-			draw_left_top_texts()
-			screen.blit(tile["image"], tile["imageRect"])
-			
-	def draw_broken_blocks(self):
-		for bloc in self.dissaperaingBlocks:
-			bloc.update()
-			bloc.draw(screen)
-
-	def get_player(self):
-		return self.player_place
-
-
-
-
-class Fireball(pygame.sprite.Sprite):
-	def __init__(self, x, y):
-		pygame.sprite.Sprite.__init__(self)
-		image = pygame.image.load(os.path.join("kepek", "tuzgolyo.png"))
-		self.image = pygame.transform.scale(image, (25, 25))
-		self.rect = self.image.get_rect()
-		self.rect.x = x + 15
-		self.rect.y = y
-		self.start_x = x
-		self.start_y = y
-		self.initial_y = y
-		self.vertical_velocity = -4
-
-	def update(self):
-		self.rect.y += self.vertical_velocity
-		distance_revealed = abs(self.initial_y - self.rect.y)
-
-		if self.vertical_velocity < 0:
-			if distance_revealed >= 200:
-				self.vertical_velocity *= -1
-		elif self.vertical_velocity > 0:
-			if self.rect.y >= self.initial_y:
-				self.vertical_velocity = -4
-				self.rect.y = self.initial_y
-		
-
-
-
-class Stalactite(pygame.sprite.Sprite):
-	def __init__(self, x, y, tile):
-		pygame.sprite.Sprite.__init__(self)
-		image = pygame.image.load(os.path.join("kepek", "tuzgolyo.png"))
-		self.image = pygame.transform.scale(image, (25, 25))
-		self.rect = self.image.get_rect()
-		self.rect.x = x + 15
-		self.rect.y = y + 30
-		self.start_x = x
-		self.start_y = y
-		self.initial_y = y
-		self.starting_tile = tile["imageRect"]
-		self.fall = 0
-		self.vertical_velocity = 7
-
-	def update(self, player : Player, tile_list : list):
-		if player.rect.y - 250 <= self.rect.y and player.rect.x + 15 >= self.rect.x:
-			self.fall = 1
-
-		if self.fall:
-			self.rect.y += self.vertical_velocity
-			for tile in tile_list:
-				if self.rect.colliderect(tile["imageRect"]) and not self.rect.colliderect(self.starting_tile):
-					self.kill()
-
-		if self.rect.colliderect(player):
-			player.died = 1
-
-
-
-
-
-class DisappearingBlock(pygame.sprite.Sprite):
-	def __init__(self, x, y, image, second):
-		pygame.sprite.Sprite.__init__(self)
-		self.image = image
-		self.rect = self.image.get_rect()
-		self.rect.x = x
-		self.rect.y = y
-		self.visible = 1
-		self.last_toggle_time = time.time()
-		self.sec = second
-
-	def update(self):
-		current_time = time.time()
-		if current_time - self.last_toggle_time > self.sec:
-			self.visible = not self.visible
-			self.last_toggle_time = current_time
-
-	def draw(self, surface):
-		if self.visible:
-			surface.blit(self.image, self.rect)
-
-
-
-
+from world import World
 
 
 def saving_game(points, level, chosen_lang, name):
@@ -428,7 +27,6 @@ def saving_game(points, level, chosen_lang, name):
 
 	response = requests.post(url=url, json=saving)
 	
-	print(response.json())
 
 	response.raise_for_status()
 
@@ -445,6 +43,7 @@ NAME = login.name
 if login.successfull:
 	print("Sikeres bejelnetkezés")
 
+
 pygame.init()
 
 fonts = Selected_fonts()
@@ -454,12 +53,12 @@ screen_height = 1000
 
 choosen_language = set_language()
 
-datas = menu_page(screen_height, screen_height, fonts, choosen_language, languages)
+data = menu_page(screen_height, screen_height, fonts, choosen_language, languages)
 
-points = datas[0]
-level = datas[1]
-choosen_language = datas[2]
-music_is_on = datas[3]
+points = data[0]
+level = data[1]
+choosen_language = data[2]
+music_is_on = data[3]
 
 if music_is_on:
 	background_music = pygame.mixer.Sound("Jazz In Paris  Media Right Productions (No Copyright Music).mp3")
@@ -492,7 +91,6 @@ world8 = World(worlds.world8_data, 8, f"{level_name}: 8")
 world9 = World(worlds.world9_data, 9, f"{level_name}: 9")
 world10 = World(worlds.world10_data, 10, f"{level_name}: 10")
 World.worlds_list = [world, world2, world3, world4, world5, world6, world7, world8, world9, world10]
-#worlds_list = [world, world2, world3, world4, world5, world6, world7, world8, world9, world10]
 
 World.in_game_menu_rects = [
 	pygame.rect.Rect(screen_width*0.27, screen_height/2-50, screen_width*0.5, screen_width*0.1)
@@ -516,22 +114,22 @@ async def main(level):
 		elif level >= 9:
 			screen.blit(bg4_img, (0, 0))
 
-		current_world.draw(pause, run, languages, choosen_language)
-		current_world.draw_broken_blocks()
+		current_world.draw(pause, run, languages, choosen_language, fonts, screen, mouse=None)
+		current_world.draw_broken_blocks(screen)
 		player = current_world.get_player()
-		current_world.world_enemy_group.update()
+		current_world.world_enemy_group.update(current_world.tile_list)
 		current_world.world_enemy_group.draw(screen)
 		current_world.fireballs_group.update()
 		current_world.fireballs_group.draw(screen)
 		current_world.stalactite_group.draw(screen)
 		current_world.stalactite_group.update(player, current_world.tile_list)
-		completed = player.update()
+		completed = player.update(current_world.tile_list, current_world.entities, screen)
 
 
 		if completed == 1:
 			level += 1
 			completed = 0
-			player = Player(level, completed, player.checkpoint_x, player.checkpoint_y)
+			player = World.set_player_next_level(level, completed, player.checkpoint_x, player.checkpoint_y)
 			continue
 
 		for event in pygame.event.get():
@@ -546,7 +144,7 @@ async def main(level):
 
 		while not run and pause:
 			mouse = pygame.mouse.get_pos()
-			current_world.draw(pause, run, languages, choosen_language, mouse)
+			current_world.draw(pause, run, languages, fonts=fonts, ch_lang=choosen_language, screen=screen, mouse=mouse)
 
 			for event in pygame.event.get():
 				if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
@@ -560,7 +158,6 @@ async def main(level):
 						if rect.collidepoint(float(mouse[0]), float(mouse[1])):
 							if World.in_game_menu_rects.index(rect) == 0:
 								pause, run = 0, 0
-								saving_game(points, level, choosen_language, NAME)
 
 
 
