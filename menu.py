@@ -2,9 +2,8 @@ import pygame
 from pygame.locals import *
 import sys
 import time
-from styles import RED
-from styles import BLACK
-from styles import BLUE
+from styles import Color
+
 
 
 def start_new_game(ch_lang):
@@ -15,7 +14,7 @@ def start_new_game(ch_lang):
 
 
 def no_saves_warning(window, window_width, window_height, fonts, ch_lang, languages):
-    do_not_have_saves = fonts.font_size100.render(languages[ch_lang][6], 0, BLUE, BLACK)
+    do_not_have_saves = fonts.font_size100.render(languages[ch_lang][6], 0, Color().BLUE, Color().BLACK)
     do_not_have_saves_place = ((window_width/2-window_width*0.3), window_height*0.4)
     window.blit(do_not_have_saves, do_not_have_saves_place)
     pygame.display.update()
@@ -70,22 +69,22 @@ def menu_page(window_width, window_height, fonts, ch_lang, languages):
         window.fill((255, 255, 255))
 
         for rect in rects:
-            square = pygame.draw.rect(window, BLACK, rect)
+            square = pygame.draw.rect(window, Color().BLACK, rect)
             if square.collidepoint(float(mouse[0]), float(mouse[1])):
-                square = pygame.draw.rect(window, BLUE, rect)
+                square = pygame.draw.rect(window, Color().BLUE, rect)
 
-        new_game_text = fonts.font_size50.render(languages[ch_lang][1], 0, RED)
+        new_game_text = fonts.font_size50.render(languages[ch_lang][1], 0, Color().RED)
 
-        load_game_text = fonts.font_size50.render(languages[ch_lang][2], 0, RED)
+        load_game_text = fonts.font_size50.render(languages[ch_lang][2], 0, Color().RED)
 
-        choosen_language_text = fonts.font_size50.render(languages[ch_lang][3], 0, RED)
+        choosen_language_text = fonts.font_size50.render(languages[ch_lang][3], 0, Color().RED)
 
         if music_is_on:
-            music_button_text = fonts.font_size50.render(languages[ch_lang][4][0], 0, RED)
+            music_button_text = fonts.font_size50.render(languages[ch_lang][4][0], 0, Color().RED)
         else:
-            music_button_text = fonts.font_size50.render(languages[ch_lang][4][1], 0, RED)
+            music_button_text = fonts.font_size50.render(languages[ch_lang][4][1], 0, Color().RED)
 
-        quit_game_text = fonts.font_size50.render(languages[ch_lang][5], 0, RED)
+        quit_game_text = fonts.font_size50.render(languages[ch_lang][5], 0, Color().RED)
 
         if ch_lang == "en":
             new_game_text_place = ((rects[0].center[0])-(rects[0].center[0]*0.17), rects[0].center[1]-15)
