@@ -8,13 +8,14 @@ def set_language():
 			language = text
 			if language == "en" or language == "hu":
 				return language
+			return "hu"
 
 	except IndexError:
-		language = "en"
-		return language
+		return "hu"
 	
 	except FileNotFoundError:
 		print("Nem létezik a fájl!")
+		return "hu"
 
 languages = {
 	"en" : {
@@ -59,9 +60,10 @@ class Selected_fonts:
 		self.font_size80 = pygame.font.Font(None, 80)
 		self.font_size100 = pygame.font.Font(None, 100)
 		
-
-BLACK = (0, 0, 0)
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
-BLUE = (0, 0, 255)
-WHITE = (255, 255, 255)
+class Color:
+	def __init__(self):
+		self.BLACK = (0, 0, 0)
+		self.RED = (255, 0, 0)
+		self.GREEN = (0, 255, 0)
+		self.BLUE = (0, 0, 255)
+		self.WHITE = (255, 255, 255)
