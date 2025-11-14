@@ -1,0 +1,98 @@
+import pygame
+import os
+
+
+class Player():
+	def __init__(self, level, completed, x, y):
+		img = pygame.image.load(os.path.join("kepek", "trollface.jpg"))
+		self.image = pygame.transform.scale(img, (40, 40))
+		self.rect = self.image.get_rect()
+		self.level = level - 1
+		self.rect.x = x
+		self.rect.y = y
+		self.vel_y = 0
+		self.jumped = 0
+		self.width = self.image.get_width()
+		self.height = self.image.get_height()
+		self.checkpoint_x = self.rect.x
+		self.checkpoint_y = self.rect.y
+		self.died = 0
+		self.completed = completed
+		self.player_place = None
+
+	def update(self, tile_list, entities, screen : pygame.display):
+		dx = 0
+		dy = 0
+		key = pygame.key.get_pressed()
+		if key[pygame.K_LEFT]:
+			dx -= 5
+		if key[pygame.K_RIGHT]:
+			dx += 5
+		if key[pygame.K_UP] and self.jumped == 0:
+			self.vel_y = -15
+			self.jumped = 1
+
+		self.vel_y += 1
+		if self.vel_y > 10:
+			self.vel_y = 10
+		dy += self.vel_y
+
+		for tile in tile_list:
+			if tile["imageRect"].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
+				if key[pygame.K_UP] == 0:
+					self.jumped = 0
+				if self.vel_y < 0:
+					dy = tile["imageRect"].bottom - self.rect.top
+					self.vel_y = 0
+				elif self.vel_y >= 0:
+					dy = tile["imageRect"].top - self.rect.bottom
+					self.vel_y = 0
+				if tile["number"] == 4:
+					self.died = 1
+				if tile["number"] == 3:
+					self.checkpoint_x = tile["imageRect"].x
+					self.checkpoint_y = tile["imageRect"].y
+				if tile["number"] == 5:
+					return 1
+		
+			if tile["imageRect"].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
+				dx = 0
+
+		for enemy in entities.enemy_group:
+			if self.rect.colliderect(enemy.rect):
+				if self.rect.bottom <= enemy.rect.top + 10:
+					enemy.kill()  
+					self.vel_y = -10 
+				else: 
+					self.died = 1
+
+		for block in entities.disappearing_blocks:
+			if block.rect.colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
+				if key[pygame.K_UP] == 0:
+					self.jumped = 0
+				if self.vel_y < 0 and block.visible:
+					dy = block.rect.bottom - self.rect.top
+					self.vel_y = 0					
+				elif self.vel_y >= 0 and block.visible:
+					dy = block.rect.top - self.rect.bottom
+					self.vel_y = 0
+
+
+		for fireball in entities.fireball_group:
+			if self.rect.colliderect(fireball.rect):
+				self.died = 1
+
+		if self.rect.bottom > screen.get_height():
+			self.rect.bottom = screen.get_height()
+			dy = 0
+			
+		if self.died == 0:
+			self.rect.x += dx
+			self.rect.y += dy
+		
+		else:
+			self.rect.x = self.checkpoint_x
+			self.rect.y = self.checkpoint_y
+			self.died = 0
+
+		screen.blit(self.image, self.rect)
