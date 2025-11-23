@@ -2,28 +2,24 @@ import pygame
 from pygame.locals import *
 import sys
 import time
-from styles import Color # Feltételezzük, hogy a 'styles' modul létezik
+from styles import Color
 
-# 📐 Konstansok az arányos szövegpozícióhoz
-ORIGINAL_WIDTH = 1000
-ORIGINAL_HEIGHT = 1000
-ORIGINAL_FONT_OFFSET = 15 # Az eredeti -15 pixel eltolás y irányban
+
 
 def start_new_game(ch_lang):
     with open("saves.csv", "w") as file:
         file.write(f"0 1 {ch_lang}")
+        file.close()
+
 
 
 def no_saves_warning(window, window_width, window_height, fonts, ch_lang, languages):
-    # A szöveg és a pozíció arányosítása
-    x_pos = window_width * 0.2
-    y_pos = window_height * 0.4
-    
     do_not_have_saves = fonts.font_size100.render(languages[ch_lang][6], 0, Color().BLUE, Color().BLACK)
-    do_not_have_saves_place = (x_pos, y_pos)
+    do_not_have_saves_place = ((window_width/2-window_width*0.3), window_height*0.4)
     window.blit(do_not_have_saves, do_not_have_saves_place)
     pygame.display.update()
     time.sleep(2)
+
 
 
 def load_saved_state(choosen_lang, music):
@@ -31,88 +27,56 @@ def load_saved_state(choosen_lang, music):
     d1_saved = 0
     d2_saved = 0
     d3_saved = ""
-    try:
-        with open("saves.csv", "r") as file:
-            row = file.readline().split(" ")
-            d1 = int(row[0])
-            d2 = int(row[1])
-            d3 = str(row[2]).strip() 
-            
-            if d3 != choosen_lang:
-                changed = True
-                d1_saved = d1
-                d2_saved = d2
-                d3_saved = choosen_lang
-    except (FileNotFoundError, IndexError, ValueError):
-        raise FileNotFoundError("A mentési fájl hibás vagy nem létezik.")
-    
+    with open("saves.csv", "r") as file:
+        row = file.readline().split(" ")
+        d1 = int(row[0])
+        d2 = int(row[1])
+        d3 = str(row[2])
+        if d3 != choosen_lang:
+            changed = True
+            d1_saved = d1
+            d2_saved = d2
+            d3_saved = choosen_lang
+        file.close()
     
     if changed:
         with open("saves.csv", "w") as file:
             file.write(f"{str(d1_saved)} {str(d2_saved)} {d3_saved}")
+            file.close()
         return d1_saved, d2_saved, d3_saved, music
     else:
         return d1, d2, d3, music
 
 
-# ⚙️ Segédfüggvény a menü gombok generálásához
-def create_menu_rects(w, h):
-    # A menügombok arányos elhelyezése
-    return [
-        pygame.Rect(w*0.25, h*0.15, w*0.5, h*0.1),  # New Game
-        pygame.Rect(w*0.25, h*0.3, w*0.5, h*0.1),   # Load Game
-        pygame.Rect(w*0.25, h*0.45, w*0.5, h*0.1),  # Language
-        pygame.Rect(w*0.25, h*0.6, w*0.5, h*0.1),   # Music
-        pygame.Rect(w*0.25, h*0.75, w*0.5, h*0.1)   # Quit
-    ]
-
-# 📝 Segédfüggvény a szöveg elhelyezéséhez a gomb közepén (arányszámítás)
-def get_text_place(rect, ch_lang, w, h):
-    
-    # 1. Kiszámoljuk az Y tengely eltolását (az eredeti -15 pixel arányosítva)
-    y_offset = h * (ORIGINAL_FONT_OFFSET / ORIGINAL_HEIGHT)
-    y_pos = rect.centery - y_offset
-    
-    # 2. X tengely eltolása (A mentett arányok alapján)
-    index = menu_page.rects.index(rect) 
-    
-    if ch_lang == "en":
-        ratios = [0.17, 0.25, 0.40, 0.20, 0.30] # New Game, Load Game, Language, Music, Quit
-    else: # Hungarian (hu)
-        ratios = [0.13, 0.25, 0.35, 0.15, 0.45] # Új játék, Mentés betöltése, Nyelvválasztás, Zene ki/be, Kilépés
-    
-    x_ratio = ratios[index]
-    x_pos = rect.centerx * (1 - x_ratio)
-    
-    return (x_pos, y_pos)
 
 
 def menu_page(window_width, window_height, fonts, ch_lang, languages):
-    
-    # Képernyő beállítása RESIZABLE flaggel
-    window = pygame.display.set_mode((window_width, window_height), pygame.RESIZABLE)
-    
-    # Globális változó, hogy a segédfüggvény hozzáférjen
-    menu_page.rects = create_menu_rects(window_width, window_height)
-    
+
+    window = pygame.display.set_mode((window_width, window_height))
+    rects = [
+        pygame.Rect(window_width*0.25, window_height*0.15, window_width*0.5, window_height*0.1),
+        pygame.Rect(window_width*0.25, window_height*0.3, window_width*0.5, window_height*0.1),
+        pygame.Rect(window_width*0.25, window_height*0.45, window_width*0.5, window_height*0.1),
+        pygame.Rect(window_width*0.25, window_height*0.6, window_width*0.5, window_height*0.1),
+        pygame.Rect(window_width*0.25, window_height*0.75, window_width*0.5, window_height*0.1)
+
+    ]
     music_is_on = True
     run = 1
-    
     while run:
-        # Frissítjük a méreteket a ciklus elején
-        current_w, current_h = window.get_size()
         mouse = pygame.mouse.get_pos()
         
         window.fill((255, 255, 255))
 
-        for rect in menu_page.rects:
+        for rect in rects:
             square = pygame.draw.rect(window, Color().BLACK, rect)
             if square.collidepoint(float(mouse[0]), float(mouse[1])):
                 square = pygame.draw.rect(window, Color().BLUE, rect)
 
-        # Szövegek renderelése
         new_game_text = fonts.font_size50.render(languages[ch_lang][1], 0, Color().RED)
+
         load_game_text = fonts.font_size50.render(languages[ch_lang][2], 0, Color().RED)
+
         choosen_language_text = fonts.font_size50.render(languages[ch_lang][3], 0, Color().RED)
 
         if music_is_on:
@@ -121,56 +85,72 @@ def menu_page(window_width, window_height, fonts, ch_lang, languages):
             music_button_text = fonts.font_size50.render(languages[ch_lang][4][1], 0, Color().RED)
 
         quit_game_text = fonts.font_size50.render(languages[ch_lang][5], 0, Color().RED)
-        
-        # 📝 Szövegpozíciók dinamikus számítása és kirajzolása
-        text_list = [new_game_text, load_game_text, choosen_language_text, music_button_text, quit_game_text]
-        
-        for i, rect in enumerate(menu_page.rects):
-            text_place = get_text_place(rect, ch_lang, current_w, current_h)
-            window.blit(text_list[i], text_place)
+
+        if ch_lang == "en":
+            new_game_text_place = ((rects[0].center[0])-(rects[0].center[0]*0.17), rects[0].center[1]-15)
+
+            load_game_text_place = ((rects[1].center[0])-(rects[1].center[0]*0.25), rects[1].center[1]-15)
+
+            choosen_language_text_place = ((rects[2].center[0])-(rects[2].center[0]*0.4), rects[2].center[1]-15)
+
+            music_button_text_place = ((rects[3].center[0])-(rects[3].center[0]*0.2), rects[3].center[1]-15)
+
+            quit_game_text_place = ((rects[4].center[0])-(rects[4].center[0]*0.30), rects[4].center[1]-15)
+            
+        else:
+            new_game_text_place = ((rects[0].center[0])-(rects[0].center[0]*0.13), rects[0].center[1]-15)
+
+            load_game_text_place = ((rects[1].center[0])-(rects[1].center[0]*0.25), rects[1].center[1]-15)
+
+            choosen_language_text_place = ((rects[2].center[0])-(rects[2].center[0]*0.35), rects[2].center[1]-15)
+
+            music_button_text_place = ((rects[3].center[0])-(rects[3].center[0]*0.15), rects[3].center[1]-15)
+
+            quit_game_text_place = ((rects[4].center[0])-(rects[4].center[0]*0.45), rects[4].center[1]-15)
+
+        window.blit(new_game_text, new_game_text_place)
+        window.blit(load_game_text, load_game_text_place)
+        window.blit(choosen_language_text, choosen_language_text_place)
+        window.blit(music_button_text, music_button_text_place)
+        window.blit(quit_game_text, quit_game_text_place)
 
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            
-            # 🔄 RESIZE ESEMÉNY KEZELÉSE A MENÜBEN
-            elif event.type == pygame.VIDEORESIZE:
-                window_width = event.w
-                window_height = event.h
-                # Képernyő újra beállítása
-                window = pygame.display.set_mode((window_width, window_height), pygame.RESIZABLE)
-                # Menü rects frissítése az új méretekkel
-                menu_page.rects = create_menu_rects(window_width, window_height)
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                for rect in menu_page.rects:
+                for rect in rects:
                     if rect.collidepoint(float(mouse[0]), float(mouse[1])):
-                        index = menu_page.rects.index(rect)
-                        
-                        if index == 0:  # New Game
+                        if rects.index(rect) == 0:
                             try:
                                 start_new_game(ch_lang)
                                 data = load_saved_state(ch_lang, music_is_on)
+                                run = 0
                                 return data
-                            except Exception:
+                            except Exception as e:
                                 no_saves_warning(window, window_width, window_height, fonts, ch_lang, languages)
 
-                        elif index == 1:  # Load Game
+                        elif rects.index(rect) == 1:
                             try:
                                 data = load_saved_state(ch_lang, music_is_on)
                                 return data
-                            except Exception:
+                            except Exception as e:
                                 no_saves_warning(window, window_width, window_height, fonts, ch_lang, languages)
 
-                        elif index == 2:  # Language
-                            ch_lang = "hu" if ch_lang == "en" else "en"
-                        
-                        elif index == 3:  # Music
-                            music_is_on = not music_is_on
+                        elif rects.index(rect) == 2:
+                            if ch_lang == "en":
+                                ch_lang = "hu"
+                            else:
+                                ch_lang = "en"
+                        elif rects.index(rect) == 3:
+                            if music_is_on:
+                                music_is_on = False
+                            else:
+                                music_is_on = True
 
-                        elif index == 4:  # Quit
+                        elif rects.index(rect) == len(rects)-1:
                             pygame.quit()
                             sys.exit()
 
