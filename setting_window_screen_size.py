@@ -1,23 +1,31 @@
-import pygame
-from pygame.locals import *
+import tkinter
+from tkinter import ttk
 
 def setting_size():
-    pygame.init()
 
-    screen = pygame.display.set_mode((500, 500), RESIZABLE)
-    pygame.display.set_caption("Játék méretének beállítása")
+    root = tkinter.Tk()
+    root.title("Játék méretének kiválasztása")
+    root.geometry("300x200")
 
-    run = True
-    while run:
-        print(f"width: {screen.get_width()} height: {screen.get_height()}")
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                run = False
+    selected_option = tkinter.StringVar(value="1")
 
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                run = False
+    def show_selection():
+        print(f"Selected: {selected_option.get()}")
 
-            elif event.type == VIDEORESIZE:
-                screen = pygame.display.set_mode((event.w, event.h), RESIZABLE)
+    radio1 = tkinter.Radiobutton(root, text="500X500", variable=selected_option, value="1", command=show_selection)
+    radio2 = tkinter.Radiobutton(root, text="1000X1000", variable=selected_option, value="2", command=show_selection)
 
-    return screen 
+    confirm_button = ttk.Button(
+        root,
+        text="Elfogadás",
+        command=root.destroy
+    )
+
+    radio1.pack(anchor="center")
+    radio2.pack(anchor="center")
+    confirm_button.pack(
+        pady=5
+    )
+
+    root.mainloop()
+    return selected_option.get()

@@ -1,11 +1,12 @@
 import pygame
 from pygame.locals import *
 import os
+import sys
 import worlds
 import asyncio
+from tkinter import messagebox
 import json
 import requests
-import datetime
 from login import loginWindow
 from menu import menu_page
 from styles import Color
@@ -16,40 +17,54 @@ from world import World
 from setting_window_screen_size import setting_size
 
 
-def saving_game(points, level, chosen_lang, name):
-	saving = {
-		"name": name,
-		"points" : points,
-		"level" : level,
-		"language" : choosen_language,
-		"date" : datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
-	}
-	url = "http://localhost:5233/api/UserSaveData"
+async def saving_game(points, level, chosen_lang, name):
+	try:
+		url = "http://localhost:5233/api/Save"
 
-	response = requests.post(url=url, json=saving)
-	
+		payload = json.dumps({
+  			"name": name,
+  			"points": points,
+  			"level": level,
+  			"language": chosen_lang
+		})
 
-	response.raise_for_status()
+		headers = {
+  		'Content-Type': 'application/json'
+		}
 
-	print(response.text)
+		response = requests.request("POST", url, headers=headers, data=payload)
 
-	with open("saves.csv", "w") as file:
-		file.write(f"{str(points)} {str(level)} {chosen_lang}")
-		file.close()
+		print(response.status_code)
+		print(response.text)
+
+		if(response.status_code == 200):
+			response = requests.request("PUT", url, headers=headers, data=payload)
+			print(response.status_code)
+			print(response.text)
+
+		with open("saves.csv", "w") as file:
+			file.write(f"{str(points)} {str(level)} {chosen_lang}")
+			file.close()
+
+	except requests.exceptions.ConnectionError as e:
+		messagebox.showerror("Hiba", f"Nem sikerült kapcsolatba lépni a szerverrel adatai mentéséhez!")
+	finally:
+		messagebox.showinfo("For The Potatoe", "Sikeres mentés lokálisan is!")
 
 
-"""
 login = loginWindow()
 NAME = login.name
 if login.successfull:
-	print("Sikeres bejelnetkezés")
-"""
+	pygame.init()
 
-NAME = ""
+screen = None
+screen_index = setting_size()
 
-pygame.init()
+if screen_index == "1":
+	screen = pygame.display.set_mode((500, 500))
+elif screen_index == "2":
+	screen = pygame.display.set_mode((1000, 1000))
 
-screen = setting_size()
 
 fonts = Selected_fonts()
 
@@ -102,6 +117,8 @@ World.in_game_menu_rects = [
 	pygame.rect.Rect(screen_width*0.27, screen_height/2-50, screen_width*0.5, screen_width*0.1)
 ]
 
+
+
 async def main(level):
 	run = 1
 	completed = 0
@@ -123,12 +140,7 @@ async def main(level):
 		current_world.draw(pause, run, languages, choosen_language, fonts, game_screen, mouse=None)
 		current_world.draw_broken_blocks(game_screen)
 		player = current_world.get_player()
-		current_world.world_enemy_group.update(current_world.tile_list)
-		current_world.world_enemy_group.draw(game_screen)
-		current_world.fireballs_group.update()
-		current_world.fireballs_group.draw(game_screen)
-		current_world.stalactite_group.draw(game_screen)
-		current_world.stalactite_group.update(player, current_world.tile_list)
+		current_world.not_player_objects(game_screen, player)
 		completed = player.update(current_world.tile_list, current_world.entities, game_screen)
 
 
@@ -171,7 +183,7 @@ async def main(level):
 		await asyncio.sleep(0)
 
 	if not run and not pause:
-		saving_game(points, level, choosen_language, NAME)
+		await saving_game(points, level, choosen_language, NAME)
 		pygame.quit()
 
 asyncio.run(main(level))

@@ -197,3 +197,13 @@ class World():
 
 	def get_player(self):
 		return self.player_place
+	
+	def not_player_objects(self, screen, player):
+		self.draw_broken_blocks(screen)
+		self.world_enemy_group.update(self.tile_list)
+		self.world_enemy_group.draw(screen)
+		self.fireballs_group.update()
+		self.fireballs_group.draw(screen)
+		self.stalactite_group.draw(screen)
+		self.stalactite_group.update(player, self.tile_list)
+		return 

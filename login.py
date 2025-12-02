@@ -1,15 +1,13 @@
 import tkinter
 from tkinter import ttk
+from tkinter import messagebox
 import requests
-import datetime
 import sys
 
 def login(name_entry, passw_entry, URL, app, root):
-    timestamp = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
     json_data = {
         "name" : name_entry.get(),
         "password" : passw_entry.get(),
-        "date" : timestamp
     }
 
     try:
@@ -29,7 +27,9 @@ def login(name_entry, passw_entry, URL, app, root):
             root.destroy()
 
     except requests.exceptions.RequestException as e:
-        print(f"Hiba történt: {e}")
+        messagebox.showerror("Hiba", f"Nem létezik ilyen fiók")
+    except requests.exceptions.ConnectionError as e:
+        messagebox.showerror("Hiba", "Nem sikerült kapcsolatba lépni a szerverrel a bejelentkezéshez!")
 
 
 
@@ -39,12 +39,13 @@ def loginWindow():
            self.successfull = False
            self.name = ""
 
-    LOGIN_URL = "http://localhost:5233/api/UserRegistData/Login"
+    LOGIN_URL = "http://localhost:5233/api/User/Login"
 
     app = tkinter.Tk()
     openedApp = App()
+    
     app.geometry("300x200")
-    app.title("For The Potatoe login")
+    app.title("For The Potatoe bejelentkezése")
     app.protocol("WM_DELETE_WINDOW", sys.exit)
 
     username_label = ttk.Label(app, text="Username:")
@@ -62,14 +63,14 @@ def loginWindow():
 
     login_button = ttk.Button(
         app,
-        text="Login",
+        text="Bejelentkezés",
         command=lambda: login(username_entry, password_entry, LOGIN_URL, openedApp, app)
     )
 
     login_button.pack(
         pady=5
     )
-
+    
 
     app.mainloop()
     return openedApp

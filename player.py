@@ -1,6 +1,6 @@
 import pygame
 import os
-
+from entities import Entities
 
 class Player():
 	def __init__(self, level, completed, x, y, tile_width, tile_height):
@@ -20,7 +20,7 @@ class Player():
 		self.completed = completed
 		self.player_place = None
 
-	def update(self, tile_list, entities, screen : pygame.display):
+	def update(self, tile_list, entities : Entities, screen : pygame.display):
 		dx = 0
 		dy = 0
 		key = pygame.key.get_pressed()
@@ -29,7 +29,10 @@ class Player():
 		if key[pygame.K_RIGHT]:
 			dx += 5
 		if key[pygame.K_UP] and self.jumped == 0:
-			self.vel_y = -15
+			if screen.get_width() == 500 and screen.get_height() == 500:
+				self.vel_y = -11
+			else:
+				self.vel_y = -15
 			self.jumped = 1
 
 		self.vel_y += 1
