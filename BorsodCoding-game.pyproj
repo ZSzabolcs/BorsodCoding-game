@@ -34,6 +34,7 @@
     <Compile Include="worlds.py" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include=".gitignore" />
     <Content Include="build\main\warn-main.txt" />
     <Content Include="build\main\xref-main.html" />
     <Content Include="kepek\dirt.png" />

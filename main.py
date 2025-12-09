@@ -9,6 +9,7 @@ import json
 import requests
 from login import loginWindow
 from menu import menu_page
+from menu import Data
 from styles import Color
 from styles import set_language
 from styles import languages
@@ -17,15 +18,15 @@ from world import World
 from setting_window_screen_size import setting_size
 
 
-async def saving_game(points, level, chosen_lang, name):
+async def saving_game(data : Data, name):
 	try:
 		url = "http://localhost:5233/api/Save"
 
 		payload = json.dumps({
   			"name": name,
-  			"points": points,
-  			"level": level,
-  			"language": chosen_lang
+  			"points": data.points,
+  			"level": data.level,
+  			"language": data.language
 		})
 
 		headers = {
@@ -43,7 +44,7 @@ async def saving_game(points, level, chosen_lang, name):
 			print(response.text)
 
 		with open("saves.csv", "w") as file:
-			file.write(f"{str(points)} {str(level)} {chosen_lang}")
+			file.write(f"{str(data.points)} {str(data.level)} {data.language}")
 			file.close()
 
 	except requests.exceptions.ConnectionError as e:
@@ -51,11 +52,12 @@ async def saving_game(points, level, chosen_lang, name):
 	finally:
 		messagebox.showinfo("For The Potato", "Sikeres mentés lokálisan is!")
 
-
-# login = loginWindow()
-# NAME = login.name
-# if login.successfull:
-# 	pygame.init()
+"""
+login = loginWindow()
+NAME = login.name
+if login.successfull:
+ 	pygame.init()
+"""
 pygame.init()
 screen = None
 screen_index = setting_size()
@@ -75,12 +77,8 @@ choosen_language = set_language()
 
 data = menu_page(screen_width, screen_height, fonts, choosen_language, languages)
 
-points = data[0]
-level = data[1]
-choosen_language = data[2]
-music_is_on = data[3]
 
-if music_is_on:
+if data.musicIsOn:
 	background_music = pygame.mixer.Sound("Jazz In Paris  Media Right Productions (No Copyright Music).mp3")
 	background_music.set_volume(0.6)
 	background_music.play(-1)
@@ -181,7 +179,7 @@ async def main(level):
 		await asyncio.sleep(0)
 
 	if not run and not pause:
-		await saving_game(points, level, choosen_language, NAME)
+		await saving_game(data, NAME)
 		pygame.quit()
 
-asyncio.run(main(level))
+asyncio.run(main(data.level))

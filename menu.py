@@ -4,6 +4,12 @@ import sys
 import time
 from styles import Color
 
+class Data:
+    def __init__(self, points, level, language, musicIsOn):
+        self.points = points
+        self.level = level
+        self.language = language
+        self.musicIsOn = musicIsOn
 
 
 def start_new_game(ch_lang):
@@ -38,14 +44,13 @@ def load_saved_state(choosen_lang, music):
             d2_saved = d2
             d3_saved = choosen_lang
         file.close()
-    
     if changed:
         with open("saves.csv", "w") as file:
             file.write(f"{str(d1_saved)} {str(d2_saved)} {d3_saved}")
             file.close()
-        return d1_saved, d2_saved, d3_saved, music
+        return Data(d1_saved, d2_saved, d3_saved, music)
     else:
-        return d1, d2, d3, music
+        return Data(d1, d2, d3, music)
 
 
 
