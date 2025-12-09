@@ -3,14 +3,18 @@ import os
 from entities import Entities
 
 class Player():
-	def __init__(self, level, completed, x, y, tile_width, tile_height):
+	def __init__(self, level, completed, x, y, tile_width, tile_height, screen):
 		img = pygame.image.load(os.path.join("kepek", "trollface.jpg"))
 		self.image = pygame.transform.scale(img, (tile_width - tile_width * 0.2, tile_height - tile_height * 0.2))
 		self.rect = self.image.get_rect()
 		self.level = level - 1
 		self.rect.x = x
 		self.rect.y = y
-		self.vel_y = 0
+		self.jumpvalue = 0
+		if screen.get_width() == 500 and screen.get_height() == 500:
+			self.vel_y = -11
+		else:
+			self.vel_y = -15
 		self.jumped = 0
 		self.width = self.image.get_width()
 		self.height = self.image.get_height()
@@ -29,10 +33,6 @@ class Player():
 		if key[pygame.K_RIGHT]:
 			dx += 5
 		if key[pygame.K_UP] and self.jumped == 0:
-			if screen.get_width() == 500 and screen.get_height() == 500:
-				self.vel_y = -11
-			else:
-				self.vel_y = -15
 			self.jumped = 1
 
 		self.vel_y += 1

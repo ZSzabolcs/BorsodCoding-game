@@ -49,14 +49,14 @@ async def saving_game(points, level, chosen_lang, name):
 	except requests.exceptions.ConnectionError as e:
 		messagebox.showerror("Hiba", f"Nem sikerült kapcsolatba lépni a szerverrel adatai mentéséhez!")
 	finally:
-		messagebox.showinfo("For The Potatoe", "Sikeres mentés lokálisan is!")
+		messagebox.showinfo("For The Potato", "Sikeres mentés lokálisan is!")
 
 
-login = loginWindow()
-NAME = login.name
-if login.successfull:
-	pygame.init()
-
+# login = loginWindow()
+# NAME = login.name
+# if login.successfull:
+# 	pygame.init()
+pygame.init()
 screen = None
 screen_index = setting_size()
 
@@ -86,8 +86,6 @@ if music_is_on:
 	background_music.play(-1)
 
 
-		
-game_screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption(languages[choosen_language][0])
 bg_img = pygame.image.load(os.path.join("kepek", "hatter.png")).convert()
 bg_img = pygame.transform.scale(bg_img, (screen_width, screen_height))
@@ -99,18 +97,18 @@ bg4_img = pygame.image.load(os.path.join("kepek", "hatter4.png")).convert()
 bg4_img = pygame.transform.scale(bg4_img, (screen_width, screen_height))
 
 level_name = languages[choosen_language]["in game"][0]
-World.tile_width = game_screen.get_width() / 20
-World.tile_height = game_screen.get_height() / 20
-world = World(worlds.world_data, 1, f"{level_name}: 1")
-world2 = World(worlds.world2_data, 2, f"{level_name}: 2")
-world3 = World(worlds.world3_data, 3, f"{level_name}: 3")
-world4 = World(worlds.world4_data, 4, f"{level_name}: 4")
-world5 = World(worlds.world5_data, 5, f"{level_name}: 5")
-world6 = World(worlds.world6_data, 6, f"{level_name}: 6")
-world7 = World(worlds.world7_data, 7, f"{level_name}: 7")
-world8 = World(worlds.world8_data, 8, f"{level_name}: 8")
-world9 = World(worlds.world9_data, 9, f"{level_name}: 9")
-world10 = World(worlds.world10_data, 10, f"{level_name}: 10")
+World.tile_width = screen.get_width() / 20
+World.tile_height = screen.get_height() / 20
+world = World(worlds.world_data, 1, f"{level_name}: 1", screen)
+world2 = World(worlds.world2_data, 2, f"{level_name}: 2", screen)
+world3 = World(worlds.world3_data, 3, f"{level_name}: 3", screen)
+world4 = World(worlds.world4_data, 4, f"{level_name}: 4", screen)
+world5 = World(worlds.world5_data, 5, f"{level_name}: 5", screen)
+world6 = World(worlds.world6_data, 6, f"{level_name}: 6", screen)
+world7 = World(worlds.world7_data, 7, f"{level_name}: 7", screen)
+world8 = World(worlds.world8_data, 8, f"{level_name}: 8", screen)
+world9 = World(worlds.world9_data, 9, f"{level_name}: 9", screen)
+world10 = World(worlds.world10_data, 10, f"{level_name}: 10", screen)
 World.worlds_list = [world, world2, world3, world4, world5, world6, world7, world8, world9, world10]
 
 World.in_game_menu_rects = [
@@ -129,19 +127,19 @@ async def main(level):
 		current_world = World.worlds_list[level - 1]
 		clock.tick(FPS)
 		if level < 4:
-			game_screen.blit(bg_img, (0, 0))
+			screen.blit(bg_img, (0, 0))
 		elif level >= 4 and level <= 5:
-			game_screen.blit(bg2_img, (0, 0))
+			screen.blit(bg2_img, (0, 0))
 		elif level >= 6 and level <= 8:
-			game_screen.blit(bg3_img, (0, 0))
+			screen.blit(bg3_img, (0, 0))
 		elif level >= 9:
-			game_screen.blit(bg4_img, (0, 0))
+			screen.blit(bg4_img, (0, 0))
 
-		current_world.draw(pause, run, languages, choosen_language, fonts, game_screen, mouse=None)
-		current_world.draw_broken_blocks(game_screen)
+		current_world.draw(pause, run, languages, choosen_language, fonts, screen, mouse=None)
+		current_world.draw_broken_blocks(screen)
 		player = current_world.get_player()
-		current_world.not_player_objects(game_screen, player)
-		completed = player.update(current_world.tile_list, current_world.entities, game_screen)
+		current_world.not_player_objects(screen, player)
+		completed = player.update(current_world.tile_list, current_world.entities, screen)
 
 
 		if completed == 1:

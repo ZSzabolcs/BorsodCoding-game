@@ -18,7 +18,7 @@ class World():
 		return Player(level, completed, checkpoint_x, checkpoint_y, World.tile_width, World.tile_height)
 
 
-	def __init__(self, data : list, level : int, level_name : str):
+	def __init__(self, data : list, level : int, level_name : str, screen):
 		self.level = level - 1
 		self.level_name = level_name
 		self.tile_list = []
@@ -133,7 +133,7 @@ class World():
 					make_just_disappearing_block(snow_img, col_count, row_count, 2)
 
 				if tile == "p":
-					self.player_place = Player(level, 0, col_count * World.tile_width, row_count * World.tile_height, World.tile_width, World.tile_height)
+					self.player_place = Player(level, 0, col_count * World.tile_width, row_count * World.tile_height, World.tile_width, World.tile_height, screen)
 
 				if tile == "fb":
 					fireball = Fireball(col_count * World.tile_width, row_count * World.tile_height)
