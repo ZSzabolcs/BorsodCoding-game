@@ -61,7 +61,7 @@ screen = None
 screen_index = setting_size()
 
 if screen_index == "1":
-	screen = pygame.display.set_mode((500, 500))
+	screen = pygame.display.set_mode((750, 750))
 elif screen_index == "2":
 	screen = pygame.display.set_mode((1000, 1000))
 
@@ -97,8 +97,8 @@ bg4_img = pygame.image.load(os.path.join("kepek", "hatter4.png")).convert()
 bg4_img = pygame.transform.scale(bg4_img, (screen_width, screen_height))
 
 level_name = languages[choosen_language]["in game"][0]
-World.tile_width = screen.get_width() / 20
-World.tile_height = screen.get_height() / 20
+World.tile_width = int(screen.get_width() / 20)
+World.tile_height = int(screen.get_height() / 20)
 world = World(worlds.world_data, 1, f"{level_name}: 1", screen)
 world2 = World(worlds.world2_data, 2, f"{level_name}: 2", screen)
 world3 = World(worlds.world3_data, 3, f"{level_name}: 3", screen)
