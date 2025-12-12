@@ -2,3 +2,4 @@ __pycache__
 dist
 .vs
 build
+saves.csv
