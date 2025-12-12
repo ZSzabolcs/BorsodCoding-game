@@ -14,8 +14,8 @@ class World():
 	in_game_menu_rects = []
 	worlds_list = []
 
-	def set_player_next_level(level, completed, checkpoint_x, checkpoint_y):
-		return Player(level, completed, checkpoint_x, checkpoint_y, World.tile_width, World.tile_height)
+	def set_player_next_level(level, completed, checkpoint_x, checkpoint_y, screen):
+		return Player(level, completed, checkpoint_x, checkpoint_y, World.tile_width, World.tile_height, screen)
 
 
 	def __init__(self, data : list, level : int, level_name : str, screen):

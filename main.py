@@ -143,7 +143,7 @@ async def main(level):
 		if completed == 1:
 			level += 1
 			completed = 0
-			player = World.set_player_next_level(level, completed, player.checkpoint_x, player.checkpoint_y)
+			player = World.set_player_next_level(level, completed, player.checkpoint_x, player.checkpoint_y, screen)
 			continue
 
 		for event in pygame.event.get():
