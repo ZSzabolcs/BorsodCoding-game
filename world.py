@@ -41,6 +41,7 @@ class World():
 		snow_img = pygame.image.load(os.path.join("kepek", "snow.png"))
 		snow2_img = pygame.image.load(os.path.join("kepek", "snow2.png"))
 		ice_img = pygame.image.load(os.path.join("kepek", "ice.png"))
+		cseppko_img = pygame.image.load(os.path.join("kepek", "cseppko.png"))
 
 
 		def make_just_disappearing_block(image, col_count, row_count, seconds):
