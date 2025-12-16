@@ -7,8 +7,8 @@ class Player():
 		img = pygame.image.load(os.path.join("kepek", "trollface.jpg"))
 		if screen.get_width() == 750 and screen.get_height() == 750:
 			self.vel_y = -13
-			self.meret1 = 37.5
-			self.meret2 = 37.5
+			self.meret1 = 32.5
+			self.meret2 = 32.5
 		if screen.get_width() == 1000 and screen.get_height() == 1000:
 			self.vel_y = -15
 			self.meret1 = 45

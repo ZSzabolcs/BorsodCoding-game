@@ -103,8 +103,10 @@ bg4_img = pygame.image.load(os.path.join("kepek", "hatter4.png")).convert()
 bg4_img = pygame.transform.scale(bg4_img, (screen_width, screen_height))
 
 level_name = languages[choosen_language]["in game"][0]
-World.tile_width = int(screen.get_width() / 20)
-World.tile_height = int(screen.get_height() / 20)
+World.tile_width = float(screen_width / 20)
+World.tile_height = float(screen_height / 20)
+print(World.tile_width)
+print(World.tile_height)
 world = World(worlds.world_data, 1, f"{level_name}: 1", screen)
 world2 = World(worlds.world2_data, 2, f"{level_name}: 2", screen)
 world3 = World(worlds.world3_data, 3, f"{level_name}: 3", screen)
