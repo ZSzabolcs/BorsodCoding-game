@@ -5,7 +5,7 @@ class Stalactite(pygame.sprite.Sprite):
 	def __init__(self, x, y, tile):
 		pygame.sprite.Sprite.__init__(self)
 		image = pygame.image.load(os.path.join("kepek", "cseppko.png"))
-		self.image = pygame.transform.scale(image, (25, 25))
+		self.image = pygame.transform.scale(image, (15, 15))
 		self.rect = self.image.get_rect()
 		self.rect.x = x + 15
 		self.rect.y = y + 30
