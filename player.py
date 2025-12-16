@@ -5,10 +5,12 @@ from entities import Entities
 class Player():
 	def __init__(self, level, completed, x, y, tile_width, tile_height, screen):
 		img = pygame.image.load(os.path.join("kepek", "trollface.jpg"))
+		self.meret1 = 0
+		self.meret2 = 0
 		if screen.get_width() == 750 and screen.get_height() == 750:
 			self.vel_y = -13
-			self.meret1 = 32.5
-			self.meret2 = 32.5
+			self.meret1 = 38
+			self.meret2 = 38
 		if screen.get_width() == 1000 and screen.get_height() == 1000:
 			self.vel_y = -15
 			self.meret1 = 45

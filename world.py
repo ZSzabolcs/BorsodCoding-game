@@ -9,8 +9,8 @@ from player import Player
 from entities import Entities
 
 class World():
-	tile_width = 50
-	tile_height = 50
+	tile_width = 0
+	tile_height = 0
 	in_game_menu_rects = []
 	worlds_list = []
 
