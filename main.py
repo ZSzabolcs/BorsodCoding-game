@@ -20,32 +20,39 @@ from setting_window_screen_size import setting_size
 
 async def saving_game(data : Data, name):
 	try:
-		url = "http://localhost:5233/api/Save"
+		if name == "teszt":
+			with open("saves.csv", "w") as file:
+				file.write(f"{str(data.points)} {str(data.level)} {data.language}")
+				file.close()
+		else:
+			url = "http://localhost:5233/api/Save"
 
-		payload = json.dumps({
-  			"name": name,
-  			"points": data.points,
-  			"level": data.level,
-  			"language": data.language
-		})
+			payload = json.dumps({
+				"name": name,
+				"points": data.points,
+				"level": data.level,
+				"language": data.language
+			})
 
-		headers = {
-  		'Content-Type': 'application/json'
-		}
+			headers = {
+			'Content-Type': 'application/json'
+			}
 
-		response = requests.request("POST", url, headers=headers, data=payload)
+			response = requests.request("POST", url, headers=headers, data=payload)
 
-		print(response.status_code)
-		print(response.text)
-
-		if(response.status_code == 200):
-			response = requests.request("PUT", url, headers=headers, data=payload)
 			print(response.status_code)
 			print(response.text)
 
-		with open("saves.csv", "w") as file:
-			file.write(f"{str(data.points)} {str(data.level)} {data.language}")
-			file.close()
+			if(response.status_code == 200):
+				response = requests.request("PUT", url, headers=headers, data=payload)
+				print(response.status_code)
+				print(response.text)
+
+				with open("saves.csv", "w") as file:
+					file.write(f"{str(data.points)} {str(data.level)} {data.language}")
+					file.close()
+
+		
 
 	except requests.exceptions.ConnectionError as e:
 		messagebox.showerror("Hiba", f"Nem sikerült kapcsolatba lépni a szerverrel adatai mentéséhez!")
@@ -58,6 +65,7 @@ NAME = login.name
 if login.successfull:
  	pygame.init()
 """
+NAME = "teszt"
 pygame.init()
 screen = None
 screen_index = setting_size()
@@ -179,6 +187,7 @@ async def main(level):
 		await asyncio.sleep(0)
 
 	if not run and not pause:
+		data.level = level
 		await saving_game(data, NAME)
 		pygame.quit()
 

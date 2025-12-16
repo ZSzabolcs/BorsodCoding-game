@@ -5,7 +5,7 @@ from entities import Entities
 class Player():
 	def __init__(self, level, completed, x, y, tile_width, tile_height, screen):
 		img = pygame.image.load(os.path.join("kepek", "trollface.jpg"))
-		self.image = pygame.transform.scale(img, (tile_width - tile_width * 0.2, tile_height - tile_height * 0.2))
+		self.image = pygame.transform.scale(img, (30, 30))
 		self.rect = self.image.get_rect()
 		self.level = level - 1
 		self.rect.x = x
