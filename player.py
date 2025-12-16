@@ -5,16 +5,21 @@ from entities import Entities
 class Player():
 	def __init__(self, level, completed, x, y, tile_width, tile_height, screen):
 		img = pygame.image.load(os.path.join("kepek", "trollface.jpg"))
-		self.image = pygame.transform.scale(img, (30, 30))
+		if screen.get_width() == 750 and screen.get_height() == 750:
+			self.vel_y = -13
+			self.meret1 = 37.5
+			self.meret2 = 37.5
+		if screen.get_width() == 1000 and screen.get_height() == 1000:
+			self.vel_y = -15
+			self.meret1 = 45
+			self.meret2 = 45
+		self.image = pygame.transform.scale(img, (self.meret1, self.meret2))
 		self.rect = self.image.get_rect()
 		self.level = level - 1
 		self.rect.x = x
 		self.rect.y = y
 		self.jumpvalue = 0
-		if screen.get_width() == 750 and screen.get_height() == 750:
-			self.vel_y = -13
-		else:
-			self.vel_y = -15
+			
 		self.jumped = 0
 		self.width = self.image.get_width()
 		self.height = self.image.get_height()
