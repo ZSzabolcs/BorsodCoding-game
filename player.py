@@ -10,12 +10,12 @@ class Player():
 		self.vel_y = 0
 		if screen.get_width() == 760 and screen.get_height() == 760:
 			self.vel_y = -13
-			self.meret1 = 33
-			self.meret2 = 33
+			self.meret1 = 31
+			self.meret2 = 31
 		if screen.get_width() == 1000 and screen.get_height() == 1000:
 			self.vel_y = -15
-			self.meret1 = 45
-			self.meret2 = 45
+			self.meret1 = 43
+			self.meret2 = 43
 		self.image = pygame.transform.scale(img, (self.meret1, self.meret2))
 		self.rect = self.image.get_rect()
 		self.level = level - 1
