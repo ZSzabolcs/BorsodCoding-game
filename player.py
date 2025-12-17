@@ -3,11 +3,11 @@ import os
 from entities import Entities
 
 class Player():
-	def __init__(self, level, completed, x, y, tile_width, tile_height, screen):
+	def __init__(self, level, completed, x, y, screen):
 		img = pygame.image.load(os.path.join("kepek", "trollface.jpg"))
+		self.vel_y = 0
 		self.meret1 = 0
 		self.meret2 = 0
-		self.vel_y = 0
 		if screen.get_width() == 760 and screen.get_height() == 760:
 			self.vel_y = -13
 			self.meret1 = 31

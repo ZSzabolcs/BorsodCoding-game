@@ -99,7 +99,7 @@ class World():
 					make_just_tile(goal2_img, World.tile_width, col_count, row_count, 5)
 
 				if tile == 6:
-					enemy = Enemy(col_count * World.tile_width, row_count * World.tile_height, self.level, World.tile_width, World.tile_height)
+					enemy = Enemy(col_count * World.tile_width, row_count * World.tile_height, self.level, screen)
 					self.world_enemy_group.add(enemy)
 				
 				if tile == 7:
@@ -133,7 +133,7 @@ class World():
 					make_just_disappearing_block(snow_img, col_count, row_count, 2)
 
 				if tile == "p":
-					self.player_place = Player(level, 0, col_count * World.tile_width, row_count * World.tile_height, World.tile_width, World.tile_height, screen)
+					self.player_place = Player(level, 0, col_count * World.tile_width, row_count * World.tile_height, screen)
 
 				if tile == "fb":
 					fireball = Fireball(col_count * World.tile_width, row_count * World.tile_height)
