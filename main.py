@@ -49,16 +49,16 @@ async def saving_game(data : Data, name):
 				print(response.status_code)
 				print(response.text)
 
-				with open("saves.csv", "w") as file:
-					file.write(f"{str(data.points)} {str(data.level)} {data.language}")
-					file.close()
+			with open("saves.csv", "w") as file:
+				file.write(f"{str(data.points)} {str(data.level)} {data.language}")
+				file.close()
 
 		
 
 	except requests.exceptions.ConnectionError as e:
 		messagebox.showerror("Hiba", f"Nem sikerült kapcsolatba lépni a szerverrel adatai mentéséhez!")
 	finally:
-		messagebox.showinfo("For The Potato", "Sikeres mentés lokálisan is!")
+		messagebox.showinfo("For The Potato", "Sikeres mentés lokálisan!")
 
 """
 login = loginWindow()
@@ -134,7 +134,6 @@ World.in_game_menu_rects = [
 
 async def main(level):
 	run = 1
-	completed = 0
 	clock = pygame.time.Clock()
 	FPS = 60
 	pause = 0
@@ -166,7 +165,6 @@ async def main(level):
 			level += 1
 			player_state.completed = 0
 			player = World.set_player_next_level(level, player_state.completed, player.checkpoint_x, player.checkpoint_y, screen)
-			continue
 
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:

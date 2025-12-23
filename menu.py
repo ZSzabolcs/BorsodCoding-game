@@ -12,7 +12,7 @@ class Option():
 			  language : str,
 			  languages : dict,
 			  selected_font : Selected_fonts
-			  ):
+		):
 		self.screen = screen
 		self.screen_width = screen.get_width()
 		self.screen_height = screen.get_height()
@@ -150,7 +150,7 @@ def menu_page(option : Option):
                                 data = load_saved_state(option.language, data.musicIsOn)
                                 run = 0
                             except Exception as e:
-                                messagebox.showerror("For The Potato", e.__str__())
+                                messagebox.showerror(option.languages[option.language][0], e.__str__())
                                 #no_saves_warning(window, window_width, window_height, fonts, ch_lang, languages)
 
                         elif rects.index(rect) == 1:
@@ -158,7 +158,7 @@ def menu_page(option : Option):
                                 data = load_saved_state(option.language, data.musicIsOn)
                                 run = 0
                             except Exception as e:
-                                messagebox.showerror("For The Potato", "Nincsen mentés!")
+                                messagebox.showerror(option.languages[option.language][0], option.languages[option.language][6])
                                 #no_saves_warning(window, window_width, window_height, fonts, ch_lang, languages)
 
                         elif rects.index(rect) == 2:
