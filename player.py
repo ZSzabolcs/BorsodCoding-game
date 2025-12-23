@@ -2,6 +2,11 @@ import pygame
 import os
 from entities import Entities
 
+class Player_State:
+	def __init__(self):
+		self.died = False
+		self.completed = False
+
 class Player():
 	def __init__(self, level, completed, x, y, screen):
 		img = pygame.image.load(os.path.join("kepek", "trollface.jpg"))
@@ -33,6 +38,7 @@ class Player():
 		self.player_place = None
 
 	def update(self, tile_list, entities : Entities, screen : pygame.display):
+		player_state = Player_State()
 		dx = 0
 		dy = 0
 		key = pygame.key.get_pressed()
@@ -65,7 +71,8 @@ class Player():
 					self.checkpoint_x = tile["imageRect"].x
 					self.checkpoint_y = tile["imageRect"].y
 				if tile["number"] == 5:
-					return 1
+					player_state.completed = True
+					return player_state
 		
 			if tile["imageRect"].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
 				dx = 0
@@ -106,5 +113,8 @@ class Player():
 			self.rect.x = self.checkpoint_x
 			self.rect.y = self.checkpoint_y
 			self.died = 0
+			player_state.died = True
 
+		
 		screen.blit(self.image, self.rect)
+		return player_state

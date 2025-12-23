@@ -16,6 +16,7 @@ from styles import languages
 from styles import Selected_fonts
 from world import World
 from setting_window_screen_size import setting_size
+from menu import Option
 
 
 async def saving_game(data : Data, name):
@@ -65,6 +66,7 @@ NAME = login.name
 if login.successfull:
  	pygame.init()
 """
+
 NAME = "teszt"
 pygame.init()
 screen = None
@@ -87,7 +89,9 @@ screen_height = screen.get_height()
 
 choosen_language = set_language()
 
-data = menu_page(screen_width, screen_height, fonts, choosen_language, languages)
+option = Option(screen, choosen_language, languages, fonts)
+
+data = menu_page(option)
 
 
 if data.musicIsOn:
@@ -150,13 +154,18 @@ async def main(level):
 		current_world.draw_broken_blocks(screen)
 		player = current_world.get_player()
 		current_world.not_player_objects(screen, player)
-		completed = player.update(current_world.tile_list, current_world.entities, screen)
+		player_state = player.update(current_world.tile_list, current_world.entities, screen)
 
+		if player_state.died:
+			for enemy in current_world.enemy_places:
+				current_world.world_enemy_group.remove(enemy)
+			for enemy in current_world.enemy_places:
+				current_world.world_enemy_group.add(enemy)
 
-		if completed == 1:
+		if player_state.completed:
 			level += 1
-			completed = 0
-			player = World.set_player_next_level(level, completed, player.checkpoint_x, player.checkpoint_y, screen)
+			player_state.completed = 0
+			player = World.set_player_next_level(level, player_state.completed, player.checkpoint_x, player.checkpoint_y, screen)
 			continue
 
 		for event in pygame.event.get():
@@ -195,5 +204,6 @@ async def main(level):
 		data.level = level
 		await saving_game(data, NAME)
 		pygame.quit()
+		sys.exit()
 
 asyncio.run(main(data.level))

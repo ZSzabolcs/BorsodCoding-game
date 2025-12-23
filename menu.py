@@ -3,24 +3,41 @@ from pygame.locals import *
 import sys
 import time
 from styles import Color
+from tkinter import messagebox
+from styles import Selected_fonts
 
-class Data:
-    def __init__(self, points, level, language, musicIsOn):
+class Option():
+	def __init__(self, 
+			  screen : pygame.display,
+			  language : str,
+			  languages : dict,
+			  selected_font : Selected_fonts
+			  ):
+		self.screen = screen
+		self.screen_width = screen.get_width()
+		self.screen_height = screen.get_height()
+		self.fonts = selected_font
+		self.language = language
+		self.languages = languages
+
+
+class Data():
+    def __init__(self, points = 0, level = 0, language = "", musicIsOn = True):
         self.points = points
         self.level = level
         self.language = language
         self.musicIsOn = musicIsOn
 
 
-def start_new_game(ch_lang):
+def start_new_game(language):
     with open("saves.csv", "w") as file:
-        file.write(f"0 1 {ch_lang}")
+        file.write(f"0 1 {language}")
         file.close()
 
 
 
-def no_saves_warning(window, window_width, window_height, fonts, ch_lang, languages):
-    do_not_have_saves = fonts.font_size100.render(languages[ch_lang][6], 0, Color().BLUE, Color().BLACK)
+def no_saves_warning(window, window_width, window_height, fonts, language, languages):
+    do_not_have_saves = fonts.font_size100.render(languages[language][6], 0, Color().BLUE, Color().BLACK)
     do_not_have_saves_place = ((window_width/2-window_width*0.3), window_height*0.4)
     window.blit(do_not_have_saves, do_not_have_saves_place)
     pygame.display.update()
@@ -30,44 +47,43 @@ def no_saves_warning(window, window_width, window_height, fonts, ch_lang, langua
 
 def load_saved_state(choosen_lang, music):
     changed = False
-    d1_saved = 0
-    d2_saved = 0
-    d3_saved = ""
+    data = Data()
     with open("saves.csv", "r") as file:
         row = file.readline().split(" ")
-        d1 = int(row[0])
-        d2 = int(row[1])
-        d3 = str(row[2])
-        if d3 != choosen_lang:
+        data.points = int(row[0])
+        data.level = int(row[1])
+        data.language = str(row[2])
+        if data.language != choosen_lang:
             changed = True
-            d1_saved = d1
-            d2_saved = d2
-            d3_saved = choosen_lang
+            data.language = choosen_lang
         file.close()
     if changed:
         with open("saves.csv", "w") as file:
-            file.write(f"{str(d1_saved)} {str(d2_saved)} {d3_saved}")
+            file.write(f"{str(data.points)} {str(data.level)} {data.language}")
             file.close()
-        return Data(d1_saved, d2_saved, d3_saved, music)
+        data.musicIsOn = music
     else:
-        return Data(d1, d2, d3, music)
+        data.musicIsOn = music
+
+    return data
 
 
 
 
-def menu_page(window_width, window_height, fonts, ch_lang, languages):
 
-    window = pygame.display.set_mode((window_width, window_height))
+def menu_page(option : Option):
+
+    window = option.screen
     rects = [
-        pygame.Rect(window_width*0.25, window_height*0.15, window_width*0.5, window_height*0.1),
-        pygame.Rect(window_width*0.25, window_height*0.3, window_width*0.5, window_height*0.1),
-        pygame.Rect(window_width*0.25, window_height*0.45, window_width*0.5, window_height*0.1),
-        pygame.Rect(window_width*0.25, window_height*0.6, window_width*0.5, window_height*0.1),
-        pygame.Rect(window_width*0.25, window_height*0.75, window_width*0.5, window_height*0.1)
+        pygame.Rect(window.get_width()*0.25, window.get_height()*0.15, window.get_width()*0.5, window.get_height()*0.1),
+        pygame.Rect(window.get_width()*0.25, window.get_height()*0.3, window.get_width()*0.5, window.get_height()*0.1),
+        pygame.Rect(window.get_width()*0.25, window.get_height()*0.45, window.get_width()*0.5, window.get_height()*0.1),
+        pygame.Rect(window.get_width()*0.25, window.get_height()*0.6, window.get_width()*0.5, window.get_height()*0.1),
+        pygame.Rect(window.get_width()*0.25, window.get_height()*0.75, window.get_width()*0.5, window.get_height()*0.1)
 
     ]
-    music_is_on = True
     run = 1
+    data = Data()
     while run:
         mouse = pygame.mouse.get_pos()
         
@@ -78,20 +94,20 @@ def menu_page(window_width, window_height, fonts, ch_lang, languages):
             if square.collidepoint(float(mouse[0]), float(mouse[1])):
                 square = pygame.draw.rect(window, Color().BLUE, rect)
 
-        new_game_text = fonts.font_size50.render(languages[ch_lang][1], 0, Color().RED)
+        new_game_text = option.fonts.font_size50.render(option.languages[option.language][1], 0, Color().RED)
 
-        load_game_text = fonts.font_size50.render(languages[ch_lang][2], 0, Color().RED)
+        load_game_text = option.fonts.font_size50.render(option.languages[option.language][2], 0, Color().RED)
 
-        choosen_language_text = fonts.font_size50.render(languages[ch_lang][3], 0, Color().RED)
+        choosen_language_text = option.fonts.font_size50.render(option.languages[option.language][3], 0, Color().RED)
 
-        if music_is_on:
-            music_button_text = fonts.font_size50.render(languages[ch_lang][4][0], 0, Color().RED)
+        if data.musicIsOn:
+            music_button_text = option.fonts.font_size50.render(option.languages[option.language][4][0], 0, Color().RED)
         else:
-            music_button_text = fonts.font_size50.render(languages[ch_lang][4][1], 0, Color().RED)
+            music_button_text = option.fonts.font_size50.render(option.languages[option.language][4][1], 0, Color().RED)
 
-        quit_game_text = fonts.font_size50.render(languages[ch_lang][5], 0, Color().RED)
+        quit_game_text = option.fonts.font_size50.render(option.languages[option.language][5], 0, Color().RED)
 
-        if ch_lang == "en":
+        if option.language == "en":
             new_game_text_place = ((rects[0].center[0])-(rects[0].center[0]*0.17), rects[0].center[1]-15)
 
             load_game_text_place = ((rects[1].center[0])-(rects[1].center[0]*0.25), rects[1].center[1]-15)
@@ -130,33 +146,36 @@ def menu_page(window_width, window_height, fonts, ch_lang, languages):
                     if rect.collidepoint(float(mouse[0]), float(mouse[1])):
                         if rects.index(rect) == 0:
                             try:
-                                start_new_game(ch_lang)
-                                data = load_saved_state(ch_lang, music_is_on)
+                                start_new_game(option.language)
+                                data = load_saved_state(option.language, data.musicIsOn)
                                 run = 0
-                                return data
                             except Exception as e:
-                                no_saves_warning(window, window_width, window_height, fonts, ch_lang, languages)
+                                messagebox.showerror("For The Potato", e.__str__())
+                                #no_saves_warning(window, window_width, window_height, fonts, ch_lang, languages)
 
                         elif rects.index(rect) == 1:
                             try:
-                                data = load_saved_state(ch_lang, music_is_on)
-                                return data
+                                data = load_saved_state(option.language, data.musicIsOn)
+                                run = 0
                             except Exception as e:
-                                no_saves_warning(window, window_width, window_height, fonts, ch_lang, languages)
+                                messagebox.showerror("For The Potato", "Nincsen mentés!")
+                                #no_saves_warning(window, window_width, window_height, fonts, ch_lang, languages)
 
                         elif rects.index(rect) == 2:
-                            if ch_lang == "en":
-                                ch_lang = "hu"
+                            if option.language == "en":
+                                option.language = "hu"
                             else:
-                                ch_lang = "en"
+                                option.language = "en"
                         elif rects.index(rect) == 3:
-                            if music_is_on:
-                                music_is_on = False
+                            if data.musicIsOn:
+                                data.musicIsOn = False
                             else:
-                                music_is_on = True
+                                data.musicIsOn = True
 
                         elif rects.index(rect) == len(rects)-1:
                             pygame.quit()
                             sys.exit()
 
         pygame.display.flip()
+    
+    return data

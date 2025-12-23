@@ -15,13 +15,14 @@ class World():
 	worlds_list = []
 
 	def set_player_next_level(level, completed, checkpoint_x, checkpoint_y, screen):
-		return Player(level, completed, checkpoint_x, checkpoint_y, World.tile_width, World.tile_height, screen)
+		return Player(level, completed, checkpoint_x, checkpoint_y, screen)
 
 
 	def __init__(self, data : list, level : int, level_name : str, screen):
 		self.level = level - 1
 		self.level_name = level_name
 		self.tile_list = []
+		self.enemy_places = []
 		self.world_enemy_group = pygame.sprite.Group()
 		self.fireballs_group = pygame.sprite.Group()
 		self.stalactite_group = pygame.sprite.Group()
@@ -101,6 +102,7 @@ class World():
 				if tile == 6:
 					enemy = Enemy(col_count * World.tile_width, row_count * World.tile_height, self.level, screen)
 					self.world_enemy_group.add(enemy)
+					self.enemy_places.append(enemy)
 				
 				if tile == 7:
 					make_just_tile(rock_img, World.tile_width, col_count, row_count, 7)
@@ -150,10 +152,13 @@ class World():
 				col_count += 1
 			row_count += 1
 
-			self.entities = Entities(enemy_group=self.world_enemy_group, 
-							disappearing_blocks=self.dissaperaingBlocks, 
-							fireball_group=self.fireballs_group, 
-							stalactite_group=self.stalactite_group)
+			self.entities = Entities(
+				enemy_group=self.world_enemy_group, 
+				disappearing_blocks=self.dissaperaingBlocks, 
+				fireball_group=self.fireballs_group, 
+				stalactite_group=self.stalactite_group
+			)
+
 
 
 
@@ -206,4 +211,3 @@ class World():
 		self.fireballs_group.draw(screen)
 		self.stalactite_group.draw(screen)
 		self.stalactite_group.update(player, self.tile_list)
-		return 
