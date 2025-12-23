@@ -21,6 +21,7 @@ class World():
 	def __init__(self, data : list, level : int, level_name : str, screen):
 		self.level = level - 1
 		self.level_name = level_name
+		self.points = 0
 		self.tile_list = []
 		self.enemy_places = []
 		self.world_enemy_group = pygame.sprite.Group()

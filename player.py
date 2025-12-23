@@ -6,6 +6,7 @@ class Player_State:
 	def __init__(self):
 		self.died = False
 		self.completed = False
+		self.killed = False
 
 class Player():
 	def __init__(self, level, completed, x, y, screen):
@@ -27,7 +28,6 @@ class Player():
 		self.rect.x = x
 		self.rect.y = y
 		self.jumpvalue = 0
-
 		self.jumped = 0
 		self.width = self.image.get_width()
 		self.height = self.image.get_height()
@@ -80,10 +80,13 @@ class Player():
 		for enemy in entities.enemy_group:
 			if self.rect.colliderect(enemy.rect):
 				if self.rect.bottom <= enemy.rect.top + 10:
-					enemy.kill()  
-					self.jumpvalue = -10 
+					enemy.kill()
+					self.jumpvalue = -10
+					player_state.killed = True
+					return player_state
 				else: 
 					self.died = 1
+
 
 		for block in entities.disappearing_blocks:
 			if block.rect.colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):

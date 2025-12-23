@@ -132,21 +132,21 @@ World.in_game_menu_rects = [
 
 
 
-async def main(level):
+async def main(data : Data):
 	run = 1
 	clock = pygame.time.Clock()
 	FPS = 60
 	pause = 0
 	while run and not pause:
-		current_world = World.worlds_list[level - 1]
+		current_world = World.worlds_list[data.level - 1]
 		clock.tick(FPS)
-		if level < 4:
+		if data.level < 4:
 			screen.blit(bg_img, (0, 0))
-		elif level >= 4 and level <= 5:
+		elif data.level >= 4 and data.level <= 5:
 			screen.blit(bg2_img, (0, 0))
-		elif level >= 6 and level <= 8:
+		elif data.level >= 6 and data.level <= 8:
 			screen.blit(bg3_img, (0, 0))
-		elif level >= 9:
+		elif data.level >= 9:
 			screen.blit(bg4_img, (0, 0))
 
 		current_world.draw(pause, run, languages, choosen_language, fonts, screen, mouse=None)
@@ -156,15 +156,24 @@ async def main(level):
 		player_state = player.update(current_world.tile_list, current_world.entities, screen)
 
 		if player_state.died:
+			remainedEnemy = len(current_world.world_enemy_group)
+			originalEnemyNumer = len(current_world.enemy_places)
+			szorzo = originalEnemyNumer - remainedEnemy
+			pontCsokkentes = szorzo * 100
+			current_world.points -= pontCsokkentes
 			for enemy in current_world.enemy_places:
 				current_world.world_enemy_group.remove(enemy)
 			for enemy in current_world.enemy_places:
 				current_world.world_enemy_group.add(enemy)
 
 		if player_state.completed:
-			level += 1
+			data.level += 1
 			player_state.completed = 0
-			player = World.set_player_next_level(level, player_state.completed, player.checkpoint_x, player.checkpoint_y, screen)
+			player = World.set_player_next_level(data.level, player_state.completed, player.checkpoint_x, player.checkpoint_y, screen)
+			data.points += current_world.points
+
+		if player_state.killed:
+			current_world.points += 100
 
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
@@ -199,9 +208,8 @@ async def main(level):
 		await asyncio.sleep(0)
 
 	if not run and not pause:
-		data.level = level
 		await saving_game(data, NAME)
 		pygame.quit()
 		sys.exit()
 
-asyncio.run(main(data.level))
+asyncio.run(main(data))
