@@ -60,15 +60,12 @@ async def saving_game(data : Data, name):
 	finally:
 		messagebox.showinfo("For The Potato", "Sikeres mentés lokálisan!")
 
-"""
 login = loginWindow()
-NAME = login.name
 if login.successfull:
  	pygame.init()
-"""
+	 
+NAME = login.name
 
-NAME = "teszt"
-pygame.init()
 screen = None
 screen_index = setting_size()
 

@@ -48,14 +48,14 @@ def loginWindow():
     app.title("For The Potatoe bejelentkezése")
     app.protocol("WM_DELETE_WINDOW", sys.exit)
 
-    username_label = ttk.Label(app, text="Username:")
+    username_label = ttk.Label(app, text="Felhasználónév:")
     username_label.pack(pady=2)
 
     username_entry = ttk.Entry(app)
     username_entry.pack(pady=5)
     username_entry.focus()
 
-    password_label = ttk.Label(app, text="Password:")
+    password_label = ttk.Label(app, text="Jelszó:")
     password_label.pack(pady=2)
 
     password_entry = ttk.Entry(app, show="*")
