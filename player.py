@@ -19,7 +19,7 @@ class Player():
 			self.meret1 = 31
 			self.meret2 = 31
 		if screen.get_width() == 1000 and screen.get_height() == 1000:
-			self.vel_y = -15
+			self.vel_y = -16
 			self.meret1 = 43
 			self.meret2 = 43
 		self.image = pygame.transform.scale(img, (self.meret1, self.meret2))
