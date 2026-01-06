@@ -15,7 +15,7 @@ class Player():
 		self.meret1 = 0
 		self.meret2 = 0
 		if screen.get_width() == 760 and screen.get_height() == 760:
-			self.vel_y = -13
+			self.vel_y = -14
 			self.meret1 = 31
 			self.meret2 = 31
 		if screen.get_width() == 1000 and screen.get_height() == 1000:
