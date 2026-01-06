@@ -2,7 +2,7 @@ import pygame
 import os
 
 class Stalactite(pygame.sprite.Sprite):
-	def __init__(self, x, y, tile):
+	def __init__(self, x, y, tile, index):
 		pygame.sprite.Sprite.__init__(self)
 		image = pygame.image.load(os.path.join("kepek", "cseppko.png"))
 		self.image = pygame.transform.scale(image, (15, 15))
@@ -15,6 +15,7 @@ class Stalactite(pygame.sprite.Sprite):
 		self.starting_tile = tile["imageRect"]
 		self.fall = 0
 		self.vertical_velocity = 7
+		self.index = index
 
 	def update(self, player, tile_list : list):
 		if player.rect.y - 250 <= self.rect.y and player.rect.x + 15 >= self.rect.x:

@@ -60,11 +60,12 @@ async def saving_game(data : Data, name):
 	finally:
 		messagebox.showinfo("For The Potato", "Sikeres mentés lokálisan!")
 
-login = loginWindow()
-if login.successfull:
- 	pygame.init()
+# login = loginWindow()
+# if login.successfull:
+#  	pygame.init()
 	 
-NAME = login.name
+NAME = "teszt"
+pygame.init()
 
 screen = None
 screen_index = setting_size()
@@ -162,6 +163,11 @@ async def main(data : Data):
 				current_world.world_enemy_group.remove(enemy)
 			for enemy in current_world.enemy_places:
 				current_world.world_enemy_group.add(enemy)
+			for stalactite in current_world.stalactite_places:
+				current_world.stalactite_group.remove(stalactite)
+			for stalactite in current_world.stalactite_places:
+				current_world.stalactite_group.add(stalactite)
+				current_world.tile_list[stalactite.index[0]][stalactite.index[1]] = stalactite
 
 		if player_state.completed:
 			data.level += 1

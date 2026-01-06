@@ -26,6 +26,7 @@ class World():
 		self.enemy_places = []
 		self.world_enemy_group = pygame.sprite.Group()
 		self.fireballs_group = pygame.sprite.Group()
+		self.stalactite_places = []
 		self.stalactite_group = pygame.sprite.Group()
 		self.player_place = None
 		self.dissaperaingBlocks = []
@@ -146,8 +147,9 @@ class World():
 				
 				if tile == "st":
 					tile = make_tile(rock_img, col_count, row_count, 7)
-					stalactite = Stalactite(col_count * World.tile_width, row_count * World.tile_height, tile)
+					stalactite = Stalactite(col_count * World.tile_width, row_count * World.tile_height, tile, (col_count, row_count))
 					self.stalactite_group.add(stalactite)
+					self.stalactite_places.append(stalactite)
 					self.tile_list.append(tile)
 
 				col_count += 1
