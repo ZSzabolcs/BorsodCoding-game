@@ -3,15 +3,15 @@ from pygame.locals import *
 import sys
 import time
 from styles import Color
-from tkinter import messagebox
 from styles import Selected_fonts
 
 class Option():
-	def __init__(self, 
-			  screen : pygame.display,
-			  language : str,
-			  languages : dict,
-			  selected_font : Selected_fonts
+	def __init__(
+        self, 
+	    screen,
+	    language : str,
+		languages : dict,
+		selected_font : Selected_fonts
 		):
 		self.screen = screen
 		self.screen_width = screen.get_width()
@@ -36,12 +36,6 @@ def start_new_game(language):
 
 
 
-def no_saves_warning(window, window_width, window_height, fonts, language, languages):
-    do_not_have_saves = fonts.font_size100.render(languages[language][6], 0, Color().BLUE, Color().BLACK)
-    do_not_have_saves_place = ((window_width/2-window_width*0.3), window_height*0.4)
-    window.blit(do_not_have_saves, do_not_have_saves_place)
-    pygame.display.update()
-    time.sleep(2)
 
 
 
@@ -84,6 +78,10 @@ def menu_page(option : Option):
     ]
     run = 1
     data = Data()
+    font_size = option.fonts.font_size40
+    if window.get_width() == 1000 and window.get_height() == 1000:
+        font_size = option.fonts.font_size50
+
     while run:
         mouse = pygame.mouse.get_pos()
         
@@ -94,18 +92,18 @@ def menu_page(option : Option):
             if square.collidepoint(float(mouse[0]), float(mouse[1])):
                 square = pygame.draw.rect(window, Color().BLUE, rect)
 
-        new_game_text = option.fonts.font_size50.render(option.languages[option.language][1], 0, Color().RED)
+        new_game_text = font_size.render(option.languages[option.language][1], 0, Color().RED)
 
-        load_game_text = option.fonts.font_size50.render(option.languages[option.language][2], 0, Color().RED)
+        load_game_text = font_size.render(option.languages[option.language][2], 0, Color().RED)
 
-        choosen_language_text = option.fonts.font_size50.render(option.languages[option.language][3], 0, Color().RED)
+        choosen_language_text = font_size.render(option.languages[option.language][3], 0, Color().RED)
 
         if data.musicIsOn:
-            music_button_text = option.fonts.font_size50.render(option.languages[option.language][4][0], 0, Color().RED)
+            music_button_text = font_size.render(option.languages[option.language][4][0], 0, Color().RED)
         else:
-            music_button_text = option.fonts.font_size50.render(option.languages[option.language][4][1], 0, Color().RED)
+            music_button_text = font_size.render(option.languages[option.language][4][1], 0, Color().RED)
 
-        quit_game_text = option.fonts.font_size50.render(option.languages[option.language][5], 0, Color().RED)
+        quit_game_text = font_size.render(option.languages[option.language][7], 0, Color().RED)
 
         if option.language == "en":
             new_game_text_place = ((rects[0].center[0])-(rects[0].center[0]*0.17), rects[0].center[1]-15)
@@ -116,7 +114,7 @@ def menu_page(option : Option):
 
             music_button_text_place = ((rects[3].center[0])-(rects[3].center[0]*0.2), rects[3].center[1]-15)
 
-            quit_game_text_place = ((rects[4].center[0])-(rects[4].center[0]*0.30), rects[4].center[1]-15)
+            quit_game_text_place = ((rects[4].center[0])-(rects[4].center[0]*0.2), rects[4].center[1]-15)
             
         else:
             new_game_text_place = ((rects[0].center[0])-(rects[0].center[0]*0.13), rects[0].center[1]-15)
@@ -127,7 +125,7 @@ def menu_page(option : Option):
 
             music_button_text_place = ((rects[3].center[0])-(rects[3].center[0]*0.15), rects[3].center[1]-15)
 
-            quit_game_text_place = ((rects[4].center[0])-(rects[4].center[0]*0.45), rects[4].center[1]-15)
+            quit_game_text_place = ((rects[4].center[0])-(rects[4].center[0]*0.27), rects[4].center[1]-15)
 
         window.blit(new_game_text, new_game_text_place)
         window.blit(load_game_text, load_game_text_place)
@@ -150,16 +148,14 @@ def menu_page(option : Option):
                                 data = load_saved_state(option.language, data.musicIsOn)
                                 run = 0
                             except Exception as e:
-                                messagebox.showerror(option.languages[option.language][0], e.__str__())
-                                #no_saves_warning(window, window_width, window_height, fonts, ch_lang, languages)
+                                pygame.display.message_box(option.languages[option.language][0], e.__str__())
 
                         elif rects.index(rect) == 1:
                             try:
                                 data = load_saved_state(option.language, data.musicIsOn)
                                 run = 0
                             except Exception as e:
-                                messagebox.showerror(option.languages[option.language][0], option.languages[option.language][6])
-                                #no_saves_warning(window, window_width, window_height, fonts, ch_lang, languages)
+                                pygame.display.message_box(option.languages[option.language][0], option.languages[option.language][6])
 
                         elif rects.index(rect) == 2:
                             if option.language == "en":

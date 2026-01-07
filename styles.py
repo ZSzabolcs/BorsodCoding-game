@@ -29,9 +29,11 @@ languages = {
 		],
 		5: "Save and quit game",
 		6: "There is no saves!",
+		7: "Quit game",
 		"in game":{
 			0: "Level",
-			1: "Paused"
+			1: "Paused",
+			2: "Point"
 		}
 	},
 
@@ -46,9 +48,11 @@ languages = {
 		],
 		5: "Mentés és kilépés a játékból",
 		6: "Nincsenek mentések!",
+		7: "Kilépés a játékból",
 		"in game":{
 			0: "Szint",
-			1: "Megállítva"
+			1: "Megállítva",
+			2: "Pont"
 		}
 	}
 }
@@ -56,9 +60,9 @@ languages = {
 class Selected_fonts:
 	def __init__(self):
 		self.font_size30 = pygame.font.Font(None, 30)
+		self.font_size40 = pygame.font.Font(None, 40)
 		self.font_size50 = pygame.font.Font(None, 50)
 		self.font_size80 = pygame.font.Font(None, 80)
-		self.font_size100 = pygame.font.Font(None, 100)
 		
 class Color:
 	def __init__(self):

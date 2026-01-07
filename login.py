@@ -13,21 +13,19 @@ def login(name_entry, passw_entry, URL, app, root):
     try:
         response = requests.post(URL, json=json_data)
 
-        response.raise_for_status()
 
-        print("Sikeres kérés")
         print(response.status_code)
+        body = response.json()
+        if response.status_code != 200:
+            messagebox.showerror("Hiba", body["message"])
+
+        messagebox.showinfo("A burgonyáért!", body["message"])
         app.successfull = True
         app.name = name_entry.get()
-        data = response.json()
-        print("JSON válasz")
-        print(data)
 
         if app.successfull:
             root.destroy()
 
-    except requests.exceptions.RequestException as e:
-        messagebox.showerror("Hiba", f"Nem létezik ilyen fiók")
     except requests.exceptions.ConnectionError as e:
         messagebox.showerror("Hiba", "Nem sikerült kapcsolatba lépni a szerverrel a bejelentkezéshez!")
 

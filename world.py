@@ -147,7 +147,7 @@ class World():
 				
 				if tile == "st":
 					tile = make_tile(rock_img, col_count, row_count, 7)
-					stalactite = Stalactite(col_count * World.tile_width, row_count * World.tile_height, tile, (col_count, row_count))
+					stalactite = Stalactite(col_count * World.tile_width, row_count * World.tile_height, tile)
 					self.stalactite_group.add(stalactite)
 					self.stalactite_places.append(stalactite)
 					self.tile_list.append(tile)
@@ -165,17 +165,20 @@ class World():
 
 
 
-	def draw(self, pause, run, lang, ch_lang, fonts, screen, mouse = None):
+	def draw(self, pause, run, lang, ch_lang, fonts, screen, points, mouse = None):
 
-		def draw_left_top_texts():
+		def draw_left_top_texts(points):
 			if self.level < 5:
 				chosen_color = Color().BLACK
 			else:
 				chosen_color = Color().WHITE
 
 			level_text = fonts.font_size50.render(self.level_name, 0, chosen_color)
+			points_number = fonts.font_size50.render(str(points), 0, chosen_color)
 			level_text_place = level_text.get_rect()
+			points_number_place = (level_text_place[0] + 255, level_text_place[1])
 			screen.blit(level_text, level_text_place)
+			screen.blit(points_number, points_number_place)
 
 
 		for tile in self.tile_list:
@@ -192,10 +195,10 @@ class World():
 						square = pygame.draw.rect(screen, Color().BLUE, rect)
 				quit_game_text = fonts.font_size50.render(lang[ch_lang][5], 0, Color().RED)
 				screen.blit(quit_game_text, quit_game_text_place)
-				draw_left_top_texts()
+				draw_left_top_texts(points)
 				pygame.display.update()
 
-			draw_left_top_texts()
+			draw_left_top_texts(points)
 			screen.blit(tile["image"], tile["imageRect"])
 			
 	def draw_broken_blocks(self, screen):
@@ -203,9 +206,11 @@ class World():
 			bloc.update()
 			bloc.draw(screen)
 
+
 	def get_player(self):
 		return self.player_place
 	
+
 	def not_player_objects(self, screen, player):
 		self.draw_broken_blocks(screen)
 		self.world_enemy_group.update(self.tile_list)
@@ -214,3 +219,28 @@ class World():
 		self.fireballs_group.draw(screen)
 		self.stalactite_group.draw(screen)
 		self.stalactite_group.update(player, self.tile_list)
+
+
+	async def reload_when_player_died(self, points : int):
+		remainedEnemy = len(self.world_enemy_group)
+		originalEnemyNumer = len(self.enemy_places)
+		szorzo = originalEnemyNumer - remainedEnemy
+		pontCsokkentes = szorzo * 100
+		points -= pontCsokkentes
+		for enemy in self.enemy_places:
+			self.world_enemy_group.remove(enemy)
+
+		for enemy in self.enemy_places:
+			self.world_enemy_group.add(enemy)
+
+		for stal in self.stalactite_places:
+			self.stalactite_group.remove(stal)
+
+		for stal in self.stalactite_places:
+			stal.set_to_default()
+			self.stalactite_group.add(stal)
+
+		if points >= 0:
+			return points
+
+		return 0

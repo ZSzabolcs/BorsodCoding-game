@@ -55,6 +55,7 @@
     <Content Include="kepek\tuzgolyo.png" />
     <Content Include="kepek\water.png" />
     <Content Include="kepek\water2.png" />
+    <Content Include="saves.csv" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="build\" />
