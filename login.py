@@ -5,13 +5,12 @@ import requests
 import sys
 
 def login(name_entry, passw_entry, URL, app, root):
-    json_data = {
-        "name" : name_entry.get(),
+    try:
+        json_data = {
+        "userName" : name_entry.get(),
         "password" : passw_entry.get(),
     }
-
-    try:
-        response = requests.post(URL, json=json_data)
+        response = requests.post(URL, json=json_data, verify=False)
 
 
         print(response.status_code)
@@ -20,6 +19,8 @@ def login(name_entry, passw_entry, URL, app, root):
             messagebox.showerror("Hiba", body["message"])
 
         messagebox.showinfo("A burgonyáért!", body["message"])
+
+        app.token = body["token"]
         app.successfull = True
         app.name = name_entry.get()
 
@@ -27,17 +28,18 @@ def login(name_entry, passw_entry, URL, app, root):
             root.destroy()
 
     except requests.exceptions.ConnectionError as e:
-        messagebox.showerror("Hiba", "Nem sikerült kapcsolatba lépni a szerverrel a bejelentkezéshez!")
+        messagebox.showerror("Hiba", f"Nem sikerült kapcsolatba lépni a szerverrel a bejelentkezéshez!", icon="error")
 
 
 
 def loginWindow():
     class App:
         def __init__(self):
+           self.token = ""
            self.successfull = False
            self.name = ""
 
-    LOGIN_URL = "http://localhost:5233/api/User/Login"
+    LOGIN_URL = "https://localhost:7159/auth/login"
 
     app = tkinter.Tk()
     openedApp = App()

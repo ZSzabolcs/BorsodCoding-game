@@ -21,12 +21,12 @@ def lokalis_mentes():
 		file.write(f"{str(data.points)} {str(data.level)} {data.language}")
 		file.close()
 
-async def saving_game(data : Data, name):
+async def saving_game(data : Data, name, token):
 	try:
 		if name == "teszt":
 			lokalis_mentes()
 		else:
-			url = "http://localhost:5233/api/Save"
+			url = "https://localhost:7036/api/Save"
 
 			payload = json.dumps({
 				"name": name,
@@ -36,10 +36,11 @@ async def saving_game(data : Data, name):
 			})
 
 			headers = {
-			'Content-Type': 'application/json'
+			'Content-Type': 'application/json',
+			"Authorization" : f"Bearer {token}"
 			}
 
-			response = requests.request("POST", url, headers=headers, data=payload)
+			response = requests.request("POST", url, headers=headers, data=payload, verify=False)
 
 			print(response.status_code)
 			body = response.json()
@@ -47,7 +48,7 @@ async def saving_game(data : Data, name):
 
 			
 			if(response.status_code == 200):
-				response = requests.request("PUT", url, headers=headers, data=payload)
+				response = requests.request("PUT", url, headers=headers, data=payload, verify=False)
 				print(response.status_code)
 				body = response.json()
 				print(body["message"])
@@ -59,13 +60,15 @@ async def saving_game(data : Data, name):
 		pygame.display.message_box(languages[data.language][0], f"Nem sikerült kapcsolatba lépni a szerverrel adatai mentéséhez!", "error")
 	finally:
 		lokalis_mentes()
-		pygame.display.message_box(languages[data.language][0], "Sikeres mentés lokálisan!")
+		pygame.display.message_box(languages[data.language][0], "Sikeres mentés lokálisan!", "info")
 
+username = ""
 username = "teszt"
 if username != "teszt":
 	login = loginWindow()
 	if login.successfull:
 		NAME = login.name
+		TOKEN = login.token
 		pygame.init()
 else:
 	NAME = "teszt"
@@ -212,7 +215,7 @@ async def main(data : Data):
 		await asyncio.sleep(0)
 
 	if not run and not pause:
-		await saving_game(data, NAME)
+		await saving_game(data, NAME, TOKEN)
 		pygame.quit()
 		sys.exit()
 
