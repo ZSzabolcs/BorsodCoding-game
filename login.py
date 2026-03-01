@@ -3,6 +3,7 @@ from tkinter import ttk
 from tkinter import messagebox
 import requests
 import sys
+from styles import languages
 
 def login(name_entry, passw_entry, URL, app, root):
     try:
@@ -45,7 +46,7 @@ def loginWindow():
     openedApp = App()
     
     app.geometry("300x200")
-    app.title("For The Potatoe bejelentkezése")
+    app.title("For The Potato bejelentkezése")
     app.protocol("WM_DELETE_WINDOW", sys.exit)
 
     username_label = ttk.Label(app, text="Felhasználónév:")
