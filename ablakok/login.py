@@ -3,7 +3,7 @@ from tkinter import ttk
 from tkinter import messagebox
 import requests
 import sys
-from styles import languages
+from modulok.styles import languages
 
 def login(name_entry, passw_entry, URL, app, root):
     try:

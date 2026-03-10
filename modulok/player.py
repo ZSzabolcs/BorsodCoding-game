@@ -1,6 +1,6 @@
 import pygame
 import os
-from entities import Entities
+from .entities import Entities
 
 class Player_State:
 	def __init__(self):

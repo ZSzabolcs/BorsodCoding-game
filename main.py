@@ -2,77 +2,72 @@ import pygame
 from pygame.locals import *
 import os
 import sys
-import worlds
 import asyncio
 import json
 import requests
-from login import loginWindow
-from menu import menu_page
-from menu import Data
-from styles import set_language
-from styles import languages
-from styles import Selected_fonts
-from world import World
-from setting_window_screen_size import setting_size
-from menu import Option
+import modulok.worlds as worlds
+from ablakok.login import loginWindow
+from ablakok.menu import menu_page
+from ablakok.menu import Data
+from modulok.styles import set_language
+from modulok.styles import languages
+from modulok.styles import Selected_fonts
+from modulok.world import World
+from modulok.player import Player
+from ablakok.setting_window_screen_size import setting_size
+from ablakok.menu import Option
 
-def lokalis_mentes():
+def lokalis_mentes(data : Data):
 	with open("saves.csv", "w") as file:
 		file.write(f"{str(data.points)} {str(data.level)} {data.language}")
 		file.close()
 
 async def saving_game(data : Data, name, token):
 	try:
-		if name == "teszt":
-			lokalis_mentes()
-		else:
-			url = "https://localhost:7036/api/Save"
 
-			payload = json.dumps({
+		url = "https://localhost:7159/api/Save"
+
+		payload = json.dumps({
 				"name": name,
 				"points": data.points,
 				"level": data.level,
 				"language": data.language
-			})
+		})
 
-			headers = {
+		headers = {
 			'Content-Type': 'application/json',
 			"Authorization" : f"Bearer {token}"
 			}
 
-			response = requests.request("POST", url, headers=headers, data=payload, verify=False)
+		response = requests.request("POST", url, headers=headers, data=payload, verify=False)
 
+		print(response.status_code)
+		body = response.json()
+		print(body["message"])
+
+			
+		if(response.status_code == 200):
+			response = requests.request("PUT", url, headers=headers, data=payload, verify=False)
 			print(response.status_code)
 			body = response.json()
 			print(body["message"])
 
-			
-			if(response.status_code == 200):
-				response = requests.request("PUT", url, headers=headers, data=payload, verify=False)
-				print(response.status_code)
-				body = response.json()
-				print(body["message"])
-
-			pygame.display.message_box(languages[data.language][0], body["message"])
+		pygame.display.message_box(languages[data.language][0], body["message"])
 		
 
 	except requests.exceptions.ConnectionError as e:
 		pygame.display.message_box(languages[data.language][0], f"Nem sikerült kapcsolatba lépni a szerverrel adatai mentéséhez!", "error")
 	finally:
-		lokalis_mentes()
+		lokalis_mentes(data)
 		pygame.display.message_box(languages[data.language][0], "Sikeres mentés lokálisan!", "info")
 
-username = ""
-username = "teszt"
-if username != "teszt":
-	login = loginWindow()
-	if login.successfull:
-		NAME = login.name
-		TOKEN = login.token
-		pygame.init()
-else:
-	NAME = "teszt"
+
+login = loginWindow()
+if login.successfull:
+	NAME = login.name
+	TOKEN = login.token
 	pygame.init()
+
 
 screen = None
 screen_index = setting_size()
@@ -92,7 +87,7 @@ fonts = Selected_fonts()
 screen_width = screen.get_width()
 screen_height = screen.get_height()
 
-choosen_language = set_language()
+choosen_language = "hu"
 
 option = Option(screen, choosen_language, languages, fonts)
 
@@ -100,7 +95,7 @@ data = menu_page(option)
 
 
 if data.musicIsOn:
-	background_music = pygame.mixer.Sound("Jazz In Paris  Media Right Productions (No Copyright Music).mp3")
+	background_music = pygame.mixer.Sound(os.path.join("zenek", "Jazz In Paris  Media Right Productions (No Copyright Music).mp3"))
 	background_music.set_volume(0.6)
 	background_music.play(-1)
 
@@ -175,7 +170,7 @@ async def main(data : Data):
 		if player_state.completed:
 			data.level += 1
 			player_state.completed = 0
-			player = World.set_player_next_level(data.level, player_state.completed, player.checkpoint_x, player.checkpoint_y, screen)
+			player = Player(data.level, player_state.completed, player.checkpoint_x, player.checkpoint_y, screen)
 			data.points = sum_points
 
 		if player_state.killed:

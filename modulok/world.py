@@ -1,21 +1,18 @@
 import pygame
 import os
-from disappearingBlock import DisappearingBlock
-from enemy import Enemy
-from fireball import Fireball
-from styles import Color
-from stalactite import Stalactite
-from player import Player
-from entities import Entities
+from .disappearingBlock import DisappearingBlock
+from .enemy import Enemy
+from .fireball import Fireball
+from .styles import Color
+from .stalactite import Stalactite
+from .player import Player
+from .entities import Entities
 
 class World():
 	tile_width = 0
 	tile_height = 0
 	in_game_menu_rects = []
 	worlds_list = []
-
-	def set_player_next_level(level, completed, checkpoint_x, checkpoint_y, screen):
-		return Player(level, completed, checkpoint_x, checkpoint_y, screen)
 
 
 	def __init__(self, data : list, level : int, level_name : str, screen):
