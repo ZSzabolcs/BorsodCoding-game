@@ -28,7 +28,7 @@ class Data():
         self.musicIsOn = musicIsOn
 
 
-def start_new_game(language):
+async def start_new_game(language):
     with open("saves.csv", "w") as file:
         file.write(f"0 1 {language}")
         file.close()
@@ -38,7 +38,7 @@ def start_new_game(language):
 
 
 
-def load_saved_state(setData : Data):
+async def load_saved_state(setData : Data):
     with open("saves.csv", "r") as file:
         row = file.readline().split(" ")
         setData.points = int(row[0])
@@ -50,7 +50,7 @@ def load_saved_state(setData : Data):
 
 
 
-def menu_page(option : Option):
+async def menu_page(option : Option):
 
     window = option.screen
     rects = [
@@ -130,15 +130,15 @@ def menu_page(option : Option):
                     if rect.collidepoint(float(mouse[0]), float(mouse[1])):
                         if rects.index(rect) == 0:
                             try:
-                                start_new_game(option.language)
-                                data = load_saved_state(data)
+                                await start_new_game(option.language)
+                                data = await load_saved_state(data)
                                 run = 0
                             except Exception as e:
                                 pygame.display.message_box(option.languages[option.language][0], e.__str__())
 
                         elif rects.index(rect) == 1:
                             try:
-                                data = load_saved_state(data)
+                                data = await load_saved_state(data)
                                 run = 0
                             except Exception as e:
                                 pygame.display.message_box(option.languages[option.language][0], option.languages[option.language][6])

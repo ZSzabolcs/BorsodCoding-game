@@ -87,12 +87,11 @@ fonts = Selected_fonts()
 screen_width = screen.get_width()
 screen_height = screen.get_height()
 
-choosen_language = "hu"
 
-option = Option(screen, choosen_language, languages, fonts)
+option = Option(screen, "hu", languages, fonts)
 
-data = menu_page(option)
 
+data = asyncio.run(menu_page(option))
 
 if data.musicIsOn:
 	background_music = pygame.mixer.Sound(os.path.join("zenek", "Jazz In Paris  Media Right Productions (No Copyright Music).mp3"))
@@ -100,7 +99,7 @@ if data.musicIsOn:
 	background_music.play(-1)
 
 
-pygame.display.set_caption(languages[choosen_language][0])
+pygame.display.set_caption(languages[data.language][0])
 bg_img = pygame.image.load(os.path.join("kepek", "hatter.png")).convert()
 bg_img = pygame.transform.scale(bg_img, (screen_width, screen_height))
 bg2_img = pygame.image.load(os.path.join("kepek", "hatter2.png")).convert()
@@ -110,8 +109,8 @@ bg3_img = pygame.transform.scale(bg3_img, (screen_width, screen_height))
 bg4_img = pygame.image.load(os.path.join("kepek", "hatter4.png")).convert()
 bg4_img = pygame.transform.scale(bg4_img, (screen_width, screen_height))
 
-level_text = languages[choosen_language]["in game"][0]
-point_text = languages[choosen_language]["in game"][2]
+level_text = languages[data.language]["in game"][0]
+point_text = languages[data.language]["in game"][2]
 
 world = World(worlds.world_data, 1, f"{level_text}: 1 {point_text}: ", screen)
 world2 = World(worlds.world2_data, 2, f"{level_text}: 2 {point_text}: ", screen)
@@ -153,7 +152,7 @@ async def main(data : Data):
 				pause,
 				run,
 				languages,
-				choosen_language,
+				data.language,
 				fonts,
 				screen,
 				sum_points,
@@ -189,7 +188,7 @@ async def main(data : Data):
 
 		while not run and pause:
 			mouse = pygame.mouse.get_pos()
-			current_world.draw(pause, run, languages, fonts=fonts, ch_lang=choosen_language, screen=screen, points = sum_points, mouse=mouse)
+			current_world.draw(pause, run, languages, fonts=fonts, ch_lang=data.language, screen=screen, points = sum_points, mouse=mouse)
 
 			for event in pygame.event.get():
 				if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:

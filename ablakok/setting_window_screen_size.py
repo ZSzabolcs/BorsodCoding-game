@@ -9,11 +9,9 @@ def setting_size():
 
     selected_option = tkinter.StringVar(value="1")
 
-    def show_selection():
-        print(f"Selected: {selected_option.get()}")
 
-    radio1 = tkinter.Radiobutton(root, text="760X760", variable=selected_option, value="1", command=show_selection)
-    radio2 = tkinter.Radiobutton(root, text="1000X1000", variable=selected_option, value="2", command=show_selection)
+    radio1 = tkinter.Radiobutton(root, text="760X760", variable=selected_option, value="1")
+    radio2 = tkinter.Radiobutton(root, text="1000X1000", variable=selected_option, value="2")
 
     confirm_button = ttk.Button(
         root,
