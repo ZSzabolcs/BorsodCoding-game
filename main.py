@@ -62,13 +62,13 @@ async def saving_game(data : Data, name, token):
 		pygame.display.message_box(languages[data.language][0], "Sikeres mentés lokálisan!", "info")
 
 
-login = loginWindow()
-if login.successfull:
-	NAME = login.name
-	TOKEN = login.token
-	pygame.init()
+# login = loginWindow()
+# if login.successfull:
+# 	NAME = login.name
+# 	TOKEN = login.token
+	# pygame.init()
 
-
+pygame.init()
 screen = None
 screen_index = setting_size()
 
