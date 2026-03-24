@@ -1,1 +1,2 @@
-Ilyet is csináltam, mer azt mondták, hogy köll.
+## Modulok
+unittest - https://docs.python.org/3/library/unittest.html
