@@ -22,9 +22,11 @@ def lokalis_mentes(data : Data):
 		file.write(f"{str(data.points)} {str(data.level)} {data.language}")
 		file.close()
 
-async def saving_game(data : Data, name, token):
+async def saving_game(data : Data, name = "", token = ""):
 	try:
-
+		if name == "" or token == "":
+			return
+		
 		url = "https://localhost:7159/api/Save"
 
 		payload = json.dumps({
@@ -61,11 +63,12 @@ async def saving_game(data : Data, name, token):
 		lokalis_mentes(data)
 		pygame.display.message_box(languages[data.language][0], "Sikeres mentés lokálisan!", "info")
 
-
+name = ""
+token = ""
 # login = loginWindow()
 # if login.successfull:
-# 	NAME = login.name
-# 	TOKEN = login.token
+# 	name = login.name
+# 	token = login.token
 	# pygame.init()
 
 pygame.init()
@@ -209,7 +212,7 @@ async def main(data : Data):
 		await asyncio.sleep(0)
 
 	if not run and not pause:
-		await saving_game(data, NAME, TOKEN)
+		await saving_game(data, name, token)
 		pygame.quit()
 		sys.exit()
 

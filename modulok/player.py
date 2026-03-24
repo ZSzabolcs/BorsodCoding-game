@@ -10,14 +10,14 @@ class Player_State:
 
 class Player():
 	def __init__(self, level, completed, x, y, screen):
-		img = pygame.image.load(os.path.join("kepek", "trollface.jpg"))
+		img = pygame.image.load(os.path.join("kepek", "trollface.jpg")).convert()
 		self.vel_y = 0
 		self.meret1 = 0
 		self.meret2 = 0
 		if screen.get_width() == 760 and screen.get_height() == 760:
 			self.vel_y = -14
-			self.meret1 = 31
-			self.meret2 = 31
+			self.meret1 = 30
+			self.meret2 = 30
 		if screen.get_width() == 1000 and screen.get_height() == 1000:
 			self.vel_y = -16
 			self.meret1 = 43
