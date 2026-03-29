@@ -5,10 +5,14 @@ import requests
 import sys
 from modulok.styles import languages
 
-def login(name_entry, passw_entry, URL, app, root):
+def login(username_entry, passw_entry, URL, loginState, root):
     try:
+        if username_entry.get() == "" and passw_entry.get() == "":
+            root.destroy()
+            return
+
         json_data = {
-        "userName" : name_entry.get(),
+        "userName" : username_entry.get(),
         "password" : passw_entry.get(),
     }
         response = requests.post(URL, json=json_data, verify=False)
@@ -21,11 +25,11 @@ def login(name_entry, passw_entry, URL, app, root):
 
         messagebox.showinfo("A burgonyáért!", body["message"])
 
-        app.token = body["token"]
-        app.successfull = True
-        app.name = name_entry.get()
+        loginState.token = body["token"]
+        loginState.isSuccessfull = True
+        loginState.username = username_entry.get()
 
-        if app.successfull:
+        if loginState.isSuccessfull:
             root.destroy()
 
     except requests.exceptions.ConnectionError as e:
@@ -34,16 +38,16 @@ def login(name_entry, passw_entry, URL, app, root):
 
 
 def loginWindow():
-    class App:
+    class LoginState:
         def __init__(self):
            self.token = ""
-           self.successfull = False
-           self.name = ""
+           self.isSuccessfull = False
+           self.username = ""
 
     LOGIN_URL = "https://localhost:7159/auth/login"
 
     app = tkinter.Tk()
-    openedApp = App()
+    loginState = LoginState()
     
     app.geometry("300x200")
     app.title("For The Potato bejelentkezése")
@@ -65,7 +69,7 @@ def loginWindow():
     login_button = ttk.Button(
         app,
         text="Bejelentkezés",
-        command=lambda: login(username_entry, password_entry, LOGIN_URL, openedApp, app)
+        command=lambda: login(username_entry, password_entry, LOGIN_URL, loginState, app)
     )
 
     login_button.pack(
@@ -74,5 +78,5 @@ def loginWindow():
     
 
     app.mainloop()
-    return openedApp
+    return loginState
 

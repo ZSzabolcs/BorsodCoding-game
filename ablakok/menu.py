@@ -20,7 +20,7 @@ class Option():
 		self.languages = languages
 
 
-class Data():
+class Save():
     def __init__(self, points = 0, level = 0, language = "", musicIsOn = True):
         self.points = points
         self.level = level
@@ -38,13 +38,13 @@ async def start_new_game(language):
 
 
 
-async def load_saved_state(setData : Data):
+async def load_saved_state(save : Save):
     with open("saves.csv", "r") as file:
         row = file.readline().split(" ")
-        setData.points = int(row[0])
-        setData.level = int(row[1])
-        setData.language = str(row[2])
-    return setData
+        save.points = int(row[0])
+        save.level = int(row[1])
+        save.language = str(row[2])
+    return save
 
 
 
@@ -62,8 +62,8 @@ async def menu_page(option : Option):
 
     ]
     run = 1
-    data = Data()
-    data.language = option.language
+    save = Save()
+    save.language = option.language
     font_size = option.fonts.font_size40
     if window.get_width() == 1000 and window.get_height() == 1000:
         font_size = option.fonts.font_size50
@@ -84,7 +84,7 @@ async def menu_page(option : Option):
 
         choosen_language_text = font_size.render(option.languages[option.language][3], 0, Color().RED)
 
-        if data.musicIsOn:
+        if save.musicIsOn:
             music_button_text = font_size.render(option.languages[option.language][4][0], 0, Color().RED)
         else:
             music_button_text = font_size.render(option.languages[option.language][4][1], 0, Color().RED)
@@ -131,14 +131,14 @@ async def menu_page(option : Option):
                         if rects.index(rect) == 0:
                             try:
                                 await start_new_game(option.language)
-                                data = await load_saved_state(data)
+                                save = await load_saved_state(save)
                                 run = 0
                             except Exception as e:
                                 pygame.display.message_box(option.languages[option.language][0], e.__str__())
 
                         elif rects.index(rect) == 1:
                             try:
-                                data = await load_saved_state(data)
+                                save = await load_saved_state(save)
                                 run = 0
                             except Exception as e:
                                 pygame.display.message_box(option.languages[option.language][0], option.languages[option.language][6])
@@ -150,10 +150,10 @@ async def menu_page(option : Option):
                             else:
                                 option.language = "en"
                         elif rects.index(rect) == 3:
-                            if data.musicIsOn:
-                                data.musicIsOn = False
+                            if save.musicIsOn:
+                                save.musicIsOn = False
                             else:
-                                data.musicIsOn = True
+                                save.musicIsOn = True
 
                         elif rects.index(rect) == len(rects)-1:
                             pygame.quit()
@@ -161,4 +161,4 @@ async def menu_page(option : Option):
 
         pygame.display.flip()
     
-    return data
+    return save

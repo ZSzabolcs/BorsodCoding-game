@@ -8,7 +8,7 @@ import requests
 import modulok.worlds as worlds
 from ablakok.login import loginWindow
 from ablakok.menu import menu_page
-from ablakok.menu import Data
+from ablakok.menu import Save
 from modulok.styles import set_language
 from modulok.styles import languages
 from modulok.styles import Selected_fonts
@@ -17,12 +17,12 @@ from modulok.player import Player
 from ablakok.setting_window_screen_size import setting_size
 from ablakok.menu import Option
 
-def lokalis_mentes(data : Data):
+def lokalis_mentes(data : Save):
 	with open("saves.csv", "w") as file:
 		file.write(f"{str(data.points)} {str(data.level)} {data.language}")
 		file.close()
 
-async def saving_game(data : Data, name = "", token = ""):
+async def saving_game(data : Save, name = "", token = ""):
 	try:
 		if name == "" or token == "":
 			return
@@ -63,13 +63,13 @@ async def saving_game(data : Data, name = "", token = ""):
 		lokalis_mentes(data)
 		pygame.display.message_box(languages[data.language][0], "Sikeres mentés lokálisan!", "info")
 
-name = ""
+username = ""
 token = ""
-# login = loginWindow()
-# if login.successfull:
-# 	name = login.name
-# 	token = login.token
-	# pygame.init()
+login = loginWindow()
+if login.isSuccessfull:
+	username = login.name
+	token = login.token
+
 
 pygame.init()
 screen = None
@@ -133,7 +133,7 @@ World.in_game_menu_rects = [
 
 
 
-async def main(data : Data):
+async def main(data : Save):
 	run = 1
 	clock = pygame.time.Clock()
 	FPS = 60
@@ -212,7 +212,7 @@ async def main(data : Data):
 		await asyncio.sleep(0)
 
 	if not run and not pause:
-		await saving_game(data, name, token)
+		await saving_game(data, username, token)
 		pygame.quit()
 		sys.exit()
 
