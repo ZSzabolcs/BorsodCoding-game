@@ -34,7 +34,9 @@ languages = {
 			0: "Level",
 			1: "Paused",
 			2: "Point"
-		}
+		},
+		8: "Error occured connecting to server to save your data!",
+		9: "Sucessfully saved locally!"
 	},
 
 	"hu" :{
@@ -53,7 +55,9 @@ languages = {
 			0: "Szint",
 			1: "Megállítva",
 			2: "Pont"
-		}
+		},
+		8: "Hiba történt a szerverhez való kapcsolódáskor az adatok mentéséhez!",
+		9: "Sikeresen mentve lokálisan!"
 	}
 }
 

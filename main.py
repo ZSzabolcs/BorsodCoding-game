@@ -57,10 +57,10 @@ async def saving_game(data : Save, name = "", token = ""):
 		
 
 	except requests.exceptions.ConnectionError as e:
-		pygame.display.message_box(languages[data.language][0], f"Nem sikerült kapcsolatba lépni a szerverrel adatai mentéséhez!", "error")
+		pygame.display.message_box(languages[data.language][0], languages[data.language][8], "error")
 	finally:
 		lokalis_mentes(data)
-		pygame.display.message_box(languages[data.language][0], "Sikeres mentés lokálisan!", "info")
+		pygame.display.message_box(languages[data.language][0], languages[data.language][9], "info")
 
 username = ""
 token = ""
