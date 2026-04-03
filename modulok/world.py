@@ -52,7 +52,7 @@ class World():
 			self.dissaperaingBlocks.append(block)
 
 
-		def make_just_tile(image, tile_size, col_count, row_count, typeofnumber):
+		def make_just_tile(image, col_count, row_count, typeId):
 			img = pygame.transform.scale(image, (World.tile_width, World.tile_height))
 			img_rect = img.get_rect()
 			img_rect.x = col_count * World.tile_width
@@ -60,12 +60,12 @@ class World():
 			tile = {
 				"image" : img,
 				"imageRect" : img_rect, 
-				"number" : typeofnumber
+				"typeId" : typeId
 			}
 			self.tile_list.append(tile)
 
 
-		def make_tile(image, col_count, row_count, typeofnumber):
+		def make_tile(image, col_count, row_count, typeId):
 			img = pygame.transform.scale(image, (World.tile_width, World.tile_height))
 			img_rect = img.get_rect()
 			img_rect.x = col_count * World.tile_width
@@ -73,7 +73,7 @@ class World():
 			tile = {
 				"image" : img,
 				"imageRect" : img_rect, 
-				"number" : typeofnumber
+				"typeId" : typeId
 			}
 			return tile
 		
@@ -84,19 +84,19 @@ class World():
 			col_count = 0
 			for tile in row:
 				if tile == 1:
-					make_just_tile(dirt_img, World.tile_width, col_count, row_count, 1)
+					make_just_tile(dirt_img, col_count, row_count, 1)
 					
 				if tile == 2:
-					make_just_tile(grass_img, World.tile_width, col_count, row_count, 2)
+					make_just_tile(grass_img, col_count, row_count, 2)
 					
 				if tile == 3:
-					make_just_tile(goal_img, World.tile_width, col_count, row_count, 3)
+					make_just_tile(goal_img, col_count, row_count, 3)
 
 				if tile == DEADLY:
-					make_just_tile(water_img, World.tile_width, col_count, row_count, DEADLY)
+					make_just_tile(water_img, col_count, row_count, DEADLY)
 
 				if tile == 5:
-					make_just_tile(goal2_img, World.tile_width, col_count, row_count, 5)
+					make_just_tile(goal2_img, col_count, row_count, 5)
 
 				if tile == 6:
 					enemy = Enemy(col_count * World.tile_width, row_count * World.tile_height, self.level, screen)
@@ -104,22 +104,22 @@ class World():
 					self.enemy_places.append(enemy)
 				
 				if tile == 7:
-					make_just_tile(rock_img, World.tile_width, col_count, row_count, 7)
+					make_just_tile(rock_img, col_count, row_count, 7)
 				
 				if tile == 8:
-					make_just_tile(lava_img, World.tile_width, col_count, row_count, DEADLY)
+					make_just_tile(lava_img, col_count, row_count, DEADLY)
 
 				if tile == 9:
-					make_just_tile(snow2_img, World.tile_width, col_count, row_count, 9)
+					make_just_tile(snow2_img, col_count, row_count, 9)
 				
 				if tile == 10:
-					make_just_tile(snow_img, World.tile_width, col_count, row_count, 10)
+					make_just_tile(snow_img, col_count, row_count, 10)
 
 				if tile == 11:
-					make_just_tile(water2_img, World.tile_width, col_count, row_count, DEADLY)
+					make_just_tile(water2_img, col_count, row_count, DEADLY)
 
 				if tile == 12:
-					make_just_tile(ice_img, World.tile_width, col_count, row_count, 12)
+					make_just_tile(ice_img, col_count, row_count, 12)
 
 				if tile == "b1":
 					make_just_disappearing_block(rock_img, col_count, row_count, 2)
@@ -185,12 +185,15 @@ class World():
 					quit_game_text_place = ((World.in_game_menu_rects[0].center[0])-(World.in_game_menu_rects[0].center[0]*0.30), World.in_game_menu_rects[0].center[1]-15)
 				else:
 					quit_game_text_place = ((World.in_game_menu_rects[0].center[0])-(World.in_game_menu_rects[0].center[0]*0.45), World.in_game_menu_rects[0].center[1]-15)
-
+				quit_game_text = None
+				if screen.get_width() == 760 and screen.get_height() == 760:
+					quit_game_text = fonts.font_size40.render(lang[ch_lang][5], 0, Color().RED)
+				else:
+					quit_game_text = fonts.font_size50.render(lang[ch_lang][5], 0, Color().RED)
 				for rect in World.in_game_menu_rects:
 					square = pygame.draw.rect(screen, Color().BLACK, rect)
 					if square.collidepoint(float(mouse[0]), float(mouse[1])) and mouse is not None:
 						square = pygame.draw.rect(screen, Color().BLUE, rect)
-				quit_game_text = fonts.font_size50.render(lang[ch_lang][5], 0, Color().RED)
 				screen.blit(quit_game_text, quit_game_text_place)
 				draw_left_top_texts(points)
 				pygame.display.update()

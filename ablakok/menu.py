@@ -4,21 +4,15 @@ import sys
 from modulok.styles import Color
 from modulok.styles import Selected_fonts
 
-class Option():
-	def __init__(
-        self, 
-	    screen,
-	    language : str,
-		languages : dict,
-		selected_font : Selected_fonts
-		):
-		self.screen = screen
-		self.screen_width = screen.get_width()
-		self.screen_height = screen.get_height()
-		self.fonts = selected_font
-		self.language = language
-		self.languages = languages
-
+class Option:
+    def __init__(self, screen, language: str, languages: dict, selected_font: Selected_fonts, musicIsOn = True):
+        self.screen = screen
+        self.screen_width = screen.get_width()
+        self.screen_height = screen.get_height()
+        self.fonts = selected_font
+        self.language = language
+        self.languages = languages
+        self.musicIsOn = musicIsOn
 
 class Save():
     def __init__(self, points = 0, level = 0, language = "", musicIsOn = True):
@@ -28,25 +22,30 @@ class Save():
         self.musicIsOn = musicIsOn
 
 
-async def start_new_game(language):
+async def start_new_game(language, musicIsOn):
+    newSave = Save()
     with open("saves.csv", "w") as file:
         file.write(f"0 1 {language}")
         file.close()
+    newSave.level = 1
+    newSave.language = language
+    newSave.musicIsOn = musicIsOn
+    return newSave
 
 
 
 
 
 
-async def load_saved_state(save : Save):
+async def load_saved_state(language, musicIsOn):
+    save = Save()
     with open("saves.csv", "r") as file:
         row = file.readline().split(" ")
         save.points = int(row[0])
         save.level = int(row[1])
-        save.language = str(row[2])
+        save.language = language
+    save.musicIsOn = musicIsOn
     return save
-
-
 
 
 
@@ -62,8 +61,7 @@ async def menu_page(option : Option):
 
     ]
     run = 1
-    save = Save()
-    save.language = option.language
+    loadedSave = Save()
     font_size = option.fonts.font_size40
     if window.get_width() == 1000 and window.get_height() == 1000:
         font_size = option.fonts.font_size50
@@ -84,7 +82,7 @@ async def menu_page(option : Option):
 
         choosen_language_text = font_size.render(option.languages[option.language][3], 0, Color().RED)
 
-        if save.musicIsOn:
+        if option.musicIsOn:
             music_button_text = font_size.render(option.languages[option.language][4][0], 0, Color().RED)
         else:
             music_button_text = font_size.render(option.languages[option.language][4][1], 0, Color().RED)
@@ -130,15 +128,14 @@ async def menu_page(option : Option):
                     if rect.collidepoint(float(mouse[0]), float(mouse[1])):
                         if rects.index(rect) == 0:
                             try:
-                                await start_new_game(option.language)
-                                save = await load_saved_state(save)
+                                loadedSave = await start_new_game(option.language, option.musicIsOn)
                                 run = 0
                             except Exception as e:
                                 pygame.display.message_box(option.languages[option.language][0], e.__str__())
 
                         elif rects.index(rect) == 1:
                             try:
-                                save = await load_saved_state(save)
+                                loadedSave = await load_saved_state(option.language, option.musicIsOn)
                                 run = 0
                             except Exception as e:
                                 pygame.display.message_box(option.languages[option.language][0], option.languages[option.language][6])
@@ -150,10 +147,10 @@ async def menu_page(option : Option):
                             else:
                                 option.language = "en"
                         elif rects.index(rect) == 3:
-                            if save.musicIsOn:
-                                save.musicIsOn = False
+                            if option.musicIsOn:
+                                option.musicIsOn = False
                             else:
-                                save.musicIsOn = True
+                                option.musicIsOn = True
 
                         elif rects.index(rect) == len(rects)-1:
                             pygame.quit()
@@ -161,4 +158,5 @@ async def menu_page(option : Option):
 
         pygame.display.flip()
     
-    return save
+
+    return loadedSave

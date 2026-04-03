@@ -65,12 +65,12 @@ class Player():
 				elif self.jumpvalue >= 0:
 					dy = tile["imageRect"].top - self.rect.bottom
 					self.jumpvalue = 0
-				if tile["number"] == 4:
+				if tile["typeId"] == 4:
 					self.died = 1
-				if tile["number"] == 3:
+				if tile["typeId"] == 3:
 					self.checkpoint_x = tile["imageRect"].x
 					self.checkpoint_y = tile["imageRect"].y
-				if tile["number"] == 5:
+				if tile["typeId"] == 5:
 					player_state.completed = True
 					return player_state
 		

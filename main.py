@@ -9,7 +9,6 @@ import modulok.worlds as worlds
 from ablakok.login import loginWindow
 from ablakok.menu import menu_page
 from ablakok.menu import Save
-from modulok.styles import set_language
 from modulok.styles import languages
 from modulok.styles import Selected_fonts
 from modulok.world import World
