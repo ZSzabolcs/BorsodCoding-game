@@ -3,7 +3,6 @@ from tkinter import ttk
 from tkinter import messagebox
 import requests
 import sys
-from modulok.styles import languages
 
 def login(username_entry, passw_entry, URL, loginState, root):
     try:
@@ -49,9 +48,12 @@ def loginWindow():
     app = tkinter.Tk()
     loginState = LoginState()
     
-    app.geometry("300x200")
+    app.geometry("450x200")
     app.title("For The Potato bejelentkezése")
     app.protocol("WM_DELETE_WINDOW", sys.exit)
+
+    offline_mode_label = ttk.Label(app, text="Ha üresen nyomja meg a bejelentkezés gombot, akkor offline módon játszol!")
+    offline_mode_label.pack(pady=2)
 
     username_label = ttk.Label(app, text="Felhasználónév:")
     username_label.pack(pady=2)
