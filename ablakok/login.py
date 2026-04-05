@@ -32,6 +32,8 @@ def login(username_entry, passw_entry, URL, loginState, root):
 
     except requests.exceptions.ConnectionError as e:
         messagebox.showerror("Hiba", f"Nem sikerült kapcsolatba lépni a szerverrel a bejelentkezéshez!", icon="error")
+    except Exception as ex:
+        messagebox.showerror("Hiba", f"Nem regisztált, vagy helytelen a felhasználónév vagy jelszó!", icon="error")
 
 
 
