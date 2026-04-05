@@ -12,12 +12,12 @@ class Stalactite(pygame.sprite.Sprite):
 		self.start_x = self.rect.x
 		self.start_y = self.rect.y
 		self.starting_tile = tile["imageRect"]
-		self.is_falling = 0
+		self.is_falling = False
 		self.vertical_velocity = 7
 
 	def update(self, player, tile_list : list):
 		if player.rect.y - 250 <= self.rect.y and player.rect.x + 15 >= self.rect.x:
-			self.is_falling = 1
+			self.is_falling = True
 
 		if self.is_falling:
 			self.rect.y += self.vertical_velocity
@@ -26,9 +26,9 @@ class Stalactite(pygame.sprite.Sprite):
 					self.kill()
 
 		if self.rect.colliderect(player):
-			player.died = 1
+			player.died = True
 
 	def set_to_default(self):
 		self.rect.x = self.start_x
 		self.rect.y = self.start_y
-		self.is_falling = 0
+		self.is_falling = False

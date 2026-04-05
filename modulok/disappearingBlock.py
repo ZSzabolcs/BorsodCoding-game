@@ -9,7 +9,7 @@ class DisappearingBlock(pygame.sprite.Sprite):
 		self.rect = self.image.get_rect()
 		self.rect.x = x
 		self.rect.y = y
-		self.visible = 1
+		self.visible = True
 		self.last_toggle_time = time.time()
 		self.sec = second
 

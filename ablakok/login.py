@@ -17,7 +17,6 @@ def login(username_entry, passw_entry, URL, loginState, root):
         response = requests.post(URL, json=json_data, verify=False)
 
 
-        print(response.status_code)
         body = response.json()
         if response.status_code != 200:
             messagebox.showerror("Hiba", body["message"])

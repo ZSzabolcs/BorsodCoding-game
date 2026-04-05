@@ -129,14 +129,14 @@ async def menu_page(option : Option):
                         if rects.index(rect) == 0:
                             try:
                                 loadedSave = await start_new_game(option.language, option.musicIsOn)
-                                run = 0
+                                run = False
                             except Exception as e:
                                 pygame.display.message_box(option.languages[option.language][0], e.__str__())
 
                         elif rects.index(rect) == 1:
                             try:
                                 loadedSave = await load_saved_state(option.language, option.musicIsOn)
-                                run = 0
+                                run = False
                             except Exception as e:
                                 pygame.display.message_box(option.languages[option.language][0], option.languages[option.language][6])
                             

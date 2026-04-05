@@ -42,18 +42,18 @@ async def saving_game(data : Save, name = "", token = ""):
 
 		response = requests.request("POST", url, headers=headers, data=payload, verify=False)
 
-		print(response.status_code)
 		body = response.json()
+		print(response.status_code)
 		print(body["message"])
 
 			
-		if(response.status_code == 200):
+		if(response.status_code == 400):
 			response = requests.request("PUT", url, headers=headers, data=payload, verify=False)
 			print(response.status_code)
 			body = response.json()
 			print(body["message"])
 
-		pygame.display.message_box(languages[data.language][0], body["message"])
+		pygame.display.message_box(languages[data.language][0], body["message"], "info")
 		
 
 	except requests.exceptions.ConnectionError as e:
@@ -66,7 +66,7 @@ username = ""
 token = ""
 login = loginWindow()
 if login.isSuccessfull:
-	username = login.name
+	username = login.username
 	token = login.token
 
 
@@ -133,10 +133,10 @@ World.in_game_menu_rects = [
 
 
 async def main(data : Save):
-	run = 1
+	run = True
 	clock = pygame.time.Clock()
 	FPS = 60
-	pause = 0
+	pause = False
 	sum_points = 0
 	while run and not pause:
 		current_world = World.worlds_list[data.level - 1]
@@ -180,11 +180,11 @@ async def main(data : Save):
 
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
-				run = 0
+				run = False
 
 			elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-				pause = 1
-				run = 0
+				pause = True
+				run = False
 
 
 
@@ -194,16 +194,16 @@ async def main(data : Save):
 
 			for event in pygame.event.get():
 				if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-					pause = 0
-					run = 1
+					pause = False
+					run = True
 				elif event.type == pygame.QUIT:
-					pause = 0
-					run = 0
+					pause = False
+					run = False
 				elif event.type == pygame.MOUSEBUTTONDOWN:
 					for rect in World.in_game_menu_rects:
 						if rect.collidepoint(float(mouse[0]), float(mouse[1])):
 							if World.in_game_menu_rects.index(rect) == 0:
-								pause, run = 0, 0
+								pause, run = False, False
 
 
 

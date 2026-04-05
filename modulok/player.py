@@ -28,12 +28,12 @@ class Player():
 		self.rect.x = x
 		self.rect.y = y
 		self.jumpvalue = 0
-		self.jumped = 0
+		self.jumped = False
 		self.width = self.image.get_width()
 		self.height = self.image.get_height()
 		self.checkpoint_x = self.rect.x
 		self.checkpoint_y = self.rect.y
-		self.died = 0
+		self.died = False
 		self.completed = completed
 		self.player_place = None
 
@@ -46,9 +46,9 @@ class Player():
 			dx -= 5
 		if key[pygame.K_RIGHT]:
 			dx += 5
-		if key[pygame.K_UP] and self.jumped == 0:
+		if key[pygame.K_UP] and self.jumped == False:
 			self.jumpvalue += self.vel_y
-			self.jumped = 1
+			self.jumped = True
 
 		self.jumpvalue += 1
 		if self.jumpvalue > 10:
@@ -58,7 +58,7 @@ class Player():
 		for tile in tile_list:
 			if tile["imageRect"].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
 				if key[pygame.K_UP] == 0:
-					self.jumped = 0
+					self.jumped = False
 				if self.jumpvalue < 0:
 					dy = tile["imageRect"].bottom - self.rect.top
 					self.jumpvalue = 0
@@ -85,13 +85,13 @@ class Player():
 					player_state.killed = True
 					return player_state
 				else: 
-					self.died = 1
+					self.died = True
 
 
 		for block in entities.disappearing_blocks:
 			if block.rect.colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
 				if key[pygame.K_UP] == 0:
-					self.jumped = 0
+					self.jumped = False
 				if self.jumpvalue < 0 and block.visible:
 					dy = block.rect.bottom - self.rect.top
 					self.jumpvalue = 0					
@@ -102,20 +102,20 @@ class Player():
 
 		for fireball in entities.fireball_group:
 			if self.rect.colliderect(fireball.rect):
-				self.died = 1
+				self.died = True
 
 		if self.rect.bottom > screen.get_height():
 			self.rect.bottom = screen.get_height()
 			dy = 0
 			
-		if self.died == 0:
+		if self.died == False:
 			self.rect.x += dx
 			self.rect.y += dy
 		
 		else:
 			self.rect.x = self.checkpoint_x
 			self.rect.y = self.checkpoint_y
-			self.died = 0
+			self.died = False
 			player_state.died = True
 
 		
