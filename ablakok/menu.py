@@ -1,11 +1,12 @@
 import pygame
 from pygame.locals import *
 import sys
+import requests
 from modulok.styles import Color
 from modulok.styles import Selected_fonts
 
 class Option:
-    def __init__(self, screen, language: str, languages: dict, selected_font: Selected_fonts, musicIsOn = True):
+    def __init__(self, screen, language: str, languages: dict, selected_font: Selected_fonts, user, musicIsOn = True):
         self.screen = screen
         self.screen_width = screen.get_width()
         self.screen_height = screen.get_height()
@@ -13,6 +14,7 @@ class Option:
         self.language = language
         self.languages = languages
         self.musicIsOn = musicIsOn
+        self.user = user
 
 class Save():
     def __init__(self, points = 0, level = 0, language = "", musicIsOn = True):
@@ -37,16 +39,32 @@ async def start_new_game(language, musicIsOn):
 
 
 
-async def load_saved_state(language, musicIsOn):
-    save = Save()
-    with open("saves.csv", "r") as file:
-        row = file.readline().split(" ")
-        save.points = int(row[0])
-        save.level = int(row[1])
-        save.language = language
-    save.musicIsOn = musicIsOn
-    return save
+async def load_saved_state(language, musicIsOn, user):
+        save = Save()
+        if user["username"] != "" and user["token"] != "":
+            url = f"https://localhost:7159/api/Save/{user["username"]}"
 
+            headers = {
+            "Content-Type": "application/json",
+			"Authorization" : f"Bearer {user["token"]}"
+			}
+
+            response = requests.request("GET", url, headers=headers, verify=False)
+            print(response.status_code)
+
+            body = response.json()
+            save.language = body["value"]["language"]
+            save.level = body["value"]["level"]
+            save.points = body["value"]["points"]
+        else:
+            with open("saves.csv", "r") as file:
+                row = file.readline().split(" ")
+                save.points = int(row[0])
+                save.level = int(row[1])
+                save.language = language
+            
+        save.musicIsOn = musicIsOn
+        return save
 
 
 async def menu_page(option : Option):
@@ -135,7 +153,7 @@ async def menu_page(option : Option):
 
                         elif rects.index(rect) == 1:
                             try:
-                                loadedSave = await load_saved_state(option.language, option.musicIsOn)
+                                loadedSave = await load_saved_state(option.language, option.musicIsOn, option.user)
                                 run = False
                             except Exception as e:
                                 pygame.display.message_box(option.languages[option.language][0], option.languages[option.language][6])

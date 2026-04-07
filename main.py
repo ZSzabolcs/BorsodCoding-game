@@ -89,8 +89,9 @@ fonts = Selected_fonts()
 screen_width = screen.get_width()
 screen_height = screen.get_height()
 
+user = {"username" : username, "token": token}
 
-option = Option(screen, "hu", languages, fonts)
+option = Option(screen, "hu", languages, fonts, user)
 
 
 data = asyncio.run(menu_page(option))
