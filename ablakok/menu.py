@@ -4,6 +4,7 @@ import sys
 import requests
 from modulok.styles import Color
 from modulok.styles import Selected_fonts
+from modulok.styles import languages
 
 class Option:
     def __init__(self, screen, language: str, languages: dict, selected_font: Selected_fonts, user, musicIsOn = True):
@@ -51,11 +52,13 @@ async def load_saved_state(language, musicIsOn, user):
 
             response = requests.request("GET", url, headers=headers, verify=False)
             print(response.status_code)
-
-            body = response.json()
-            save.language = body["value"]["language"]
-            save.level = body["value"]["level"]
-            save.points = body["value"]["points"]
+            if response.status_code == 200:
+                body = response.json()
+                save.language = body["value"]["language"]
+                save.level = body["value"]["level"]
+                save.points = body["value"]["points"]
+            else:
+                raise Exception()
         else:
             with open("saves.csv", "r") as file:
                 row = file.readline().split(" ")
