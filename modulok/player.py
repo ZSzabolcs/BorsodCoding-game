@@ -66,7 +66,7 @@ class Player():
 					dy = tile["imageRect"].top - self.rect.bottom
 					self.jumpvalue = 0
 				if tile["typeId"] == 4:
-					self.died = 1
+					self.died = True
 				if tile["typeId"] == 3:
 					self.checkpoint_x = tile["imageRect"].x
 					self.checkpoint_y = tile["imageRect"].y
